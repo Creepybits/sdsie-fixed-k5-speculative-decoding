@@ -1,4 +1,12 @@
-# Fixed-K Speculative Decoding: Real, Reproducible Energy & Speed Gains
+# Fixed-K Speculative Decoding: Real, Reproducible Energy & Speed Gains  
+
+___
+Part of the broader [SDSIE](https://github.com/Creepybits/software-defined-stochastic-inference-engine)
+research project, which also explores entropy-gated dynamic speculation and INT4
+quantization — pieces still under active investigation, not included here. This repo
+contains only the specific mechanism (fixed-K speculative decoding) that's fully
+validated and reproducible as claimed. See [Relationship to SDSIE](https://github.com/Creepybits/sdsie-fixed-k5-speculative-decoding#relationship-to-sdsie) below for more.  
+___
 
 Real scout(1B)→target(8B) speculative decoding with a lossless verify/rollback loop,
 fixed draft window K=5. **Every number below is real, independently reproduced, and
@@ -30,7 +38,7 @@ forward passes required per unit of output as accepted draft batches grow.
 ## What this does NOT claim
 
 - No quantization/kernel work is included here (see the parent SDSIE repo for that,
-  including an honest report of where it currently helps and where it doesn't).
+  including a report of where it currently helps and where it doesn't).
 - No dynamic/entropy-gated draft-length adjustment — K is fixed at 5. An entropy-gated
   version was tested and, as of the parent project's latest findings, does not yet
   outperform this fixed-K approach in single-request testing. This repo intentionally
