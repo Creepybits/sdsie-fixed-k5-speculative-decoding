@@ -1,5 +1,9 @@
 # Fixed-K Speculative Decoding: Real, Reproducible Energy & Speed Gains  
 
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22210487.svg)](https://doi.org/10.5281/zenodo.22210487)
+[![Hardware](https://img.shields.io/badge/Verified%20On-NVIDIA%20RTX%205090%20Blackwell-10b981.svg)](https://sdsie.github.io/)
+[![Live Portal](https://img.shields.io/badge/Interactive%20Portal-sdsie.github.io-a855f7.svg)](https://sdsie.github.io/)  
 ___
 Part of the broader [SDSIE](https://github.com/Creepybits/software-defined-stochastic-inference-engine)
 research project, which also explores entropy-gated dynamic speculation and INT4
