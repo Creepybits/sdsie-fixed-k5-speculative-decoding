@@ -1,0 +1,16 @@
+timestamp,category,prompt_label,tokens,throughput_tok_sec,avg_power_watts,total_energy_joules,joules_per_token
+2026-09-02T06:28:39.837022,FP16 Baseline (matched harness),Poem_trial1,250,45.13,375.5,2080.132,8.320528
+2026-09-02T06:28:45.664515,FP16 Baseline (matched harness),Poem_trial2,250,43.59,404.88,2321.9232,9.287693
+2026-09-02T06:28:51.422144,FP16 Baseline (matched harness),Poem_trial3,250,44.12,415.54,2354.7389,9.418956
+2026-09-02T06:28:57.159532,FP16 Baseline (matched harness),Poem_trial4,250,44.33,418.64,2360.8973,9.443589
+2026-09-02T06:29:02.883430,FP16 Baseline (matched harness),Poem_trial5,250,44.39,421.28,2372.5433,9.490173
+2026-09-02T06:29:08.485698,FP16 Baseline (matched harness),Physics_trial1,250,45.43,421.07,2317.1576,9.26863
+2026-09-02T06:29:14.228234,FP16 Baseline (matched harness),Physics_trial2,250,44.25,417.52,2359.0699,9.43628
+2026-09-02T06:29:19.954284,FP16 Baseline (matched harness),Physics_trial3,250,44.37,425.32,2396.2153,9.584861
+2026-09-02T06:29:25.711708,FP16 Baseline (matched harness),Physics_trial4,250,44.14,428.7,2427.8649,9.71146
+2026-09-02T06:29:31.434050,FP16 Baseline (matched harness),Physics_trial5,250,44.41,432.09,2432.5004,9.730002
+2026-09-02T06:29:37.246568,FP16 Baseline (matched harness),Code_trial1,250,43.72,423.63,2422.4651,9.68986
+2026-09-02T06:29:42.832440,FP16 Baseline (matched harness),Code_trial2,250,45.5,433.63,2382.7808,9.531123
+2026-09-02T06:29:48.504915,FP16 Baseline (matched harness),Code_trial3,250,44.79,434.95,2427.7043,9.710817
+2026-09-02T06:29:54.267895,FP16 Baseline (matched harness),Code_trial4,250,44.09,433.3,2457.0416,9.828166
+2026-09-02T06:30:00.035516,FP16 Baseline (matched harness),Code_trial5,250,44.06,436.38,2476.0541,9.904216

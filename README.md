@@ -26,18 +26,19 @@ contains only the part that's fully validated and works as claimed.
 
 | Prompt | Baseline tok/s | Speculative tok/s | Speedup | Baseline J/tok | Speculative J/tok | Energy Δ | Accept % |
 |---|---|---|---|---|---|---|---|
-| Poem | 38.2 | 40.9 | +7.1% | 12.42 ± 0.17 | 8.38 ± 0.13 | −32.5% | 42.5% |
-| Physics | 37.9 | 46.9 | +23.7% | 12.54 ± 0.16 | 7.66 ± 0.10 | −38.9% | 51.7% |
-| Code | 38.2 | **69.2** | **+81.2%** | 12.54 ± 0.17 | **5.01 ± 0.10** | **−60.0%** | **85.4%** |
+| Poem | 40.0 | 43.4 | +8.6% | 11.58 ± 0.17 | 7.80 ± 0.08 | −32.6% | 42.5% |
+| Physics | 40.2 | 50.1 | +24.8% | 11.64 ± 0.10 | 7.09 ± 0.08 | −39.1% | 51.7% |
+| Code | 40.7 | **74.1** | **+82.3%** | 11.64 ± 0.10 | **4.62 ± 0.09** | **−60.3%** | **85.4%** |
 
 Speedup and energy reduction scale with draft-acceptance rate — higher on predictable
 content (code), lower but still real on less predictable content (free-form prose).
 
 Accept rates were independently cross-validated across three separately-executed runs
 (deterministic greedy decoding), consistent with correctly-implemented accept/reject
-logic. Mean GPU power during speculative runs (343–359 W) is lower than during the FP16
-baseline (474–479 W) despite two resident models, consistent with fewer full 8B-parameter
-forward passes required per unit of output as accepted draft batches grow.
+logic. Mean GPU power during speculative runs (338.6–355.2 W) is lower
+than during the FP16 baseline (462.9–473.2 W) despite two resident models,
+consistent with fewer full 8B-parameter forward passes required per unit of output as
+accepted draft batches grow.
 
 ## What this does NOT claim
 
@@ -60,6 +61,11 @@ work applied caching unevenly, which structurally penalized the speculative path
 fallback step. Recomputing from scratch for both arms removes that confound, at the cost
 of both being slower in absolute terms than a production server with caching would be.
 
+Both baseline and speculative measurements are preceded by 5 untimed warmup forward
+passes (not recorded), so reported numbers reflect steady-state GPU clock/thermal
+behavior rather than cold-start overhead. This warmup procedure is applied identically
+across `benchmark_ablation.py`, `fp16_baseline.py`, and `speculative_scout.py`.
+
 Power measured via 100 Hz NVML polling. Fidelity measured as exact greedy-decoding token
 match between baseline and speculative output.
 
@@ -68,8 +74,9 @@ match between baseline and speculative output.
 ```
 speculative_scout.py      - Standalone reference implementation, single-run
 benchmark_ablation.py     - N=10 trial ablation across 3 prompts (source of table above)
-fp16_baseline.py          - Standalone matched baseline, same harness/methodology
+fp16_baseline.py          - Standalone matched baseline, same warmup/methodology
 telemetry/                - Raw JSON/CSV output from the runs behind the table above
+assets/                   - Plots generated from telemetry (see plot_*.py scripts)
 ```
 
 ## Running it
@@ -85,6 +92,10 @@ python3 benchmark_ablation.py
 
 # Matched FP16 baseline only
 python3 fp16_baseline.py
+
+# Regenerate plots from the latest telemetry
+python3 plot_ablation_results.py
+python3 plot_baseline_stability.py
 ```
 
 Requires an NVIDIA GPU with enough VRAM for both a ~1B and ~8B parameter model in

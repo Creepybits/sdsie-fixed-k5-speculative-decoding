@@ -5,6 +5,15 @@ N-trial baseline-vs-speculative ablation, fixed K=5, three reference prompts.
 This is the source of the paper-worthy numbers: up to 1.81x speedup and
 32.5-60.0% energy reduction vs. FP16 baseline, 100% output fidelity,
 N=10 trials/prompt. See README.md for the exact reported results.
+
+Methodology note (added 2026-09-02): both generate_baseline() and
+generate_speculative_exact() now run WARMUP_STEPS untimed forward passes
+immediately before each timed measurement, matching fp16_baseline.py's
+warmup procedure. Previously this script had no warmup at all, which meant
+its baseline power/throughput numbers were not directly comparable to
+fp16_baseline.py's despite both being described as a "matched harness" --
+that mismatch is now fixed. Values reported before this change should be
+treated as superseded; re-run to regenerate telemetry/academic_validation_results.json.
 """
 
 import time
@@ -22,6 +31,7 @@ DEVICE = "cuda:0"
 NUM_TRIALS = 10
 MAX_TOKENS = 250
 K_DRAFT = 5
+WARMUP_STEPS = 5  # matches fp16_baseline.py's default, for apples-to-apples comparison
 
 PROMPTS = [
     "Write an original Chant Royal poem in English celebrating mathematics.",
@@ -79,14 +89,23 @@ class NVMLPowerMonitor:
         pynvml.nvmlShutdown()
 
 
-def generate_baseline(target_model, tokenizer, prompt, max_tokens, monitor):
+def generate_baseline(target_model, tokenizer, prompt, max_tokens, monitor, warmup_steps=WARMUP_STEPS):
     inputs = tokenizer(
         tokenizer.apply_chat_template([{"role": "user", "content": prompt}], tokenize=False, add_generation_prompt=True),
         return_tensors="pt"
     ).to(DEVICE)
-    
+
     current_ids = inputs.input_ids
     generated = []
+
+    # --- Warmup (not timed, not recorded) ---
+    with torch.inference_mode():
+        warm_ids = current_ids.clone()
+        for _ in range(warmup_steps):
+            t_out = target_model(warm_ids)
+            next_tok = torch.argmax(t_out.logits[:, -1, :], dim=-1, keepdim=True)
+            warm_ids = torch.cat([warm_ids, next_tok], dim=-1)
+    torch.cuda.synchronize()
 
     torch.cuda.synchronize()
     t0 = time.perf_counter()
@@ -121,7 +140,7 @@ def generate_baseline(target_model, tokenizer, prompt, max_tokens, monitor):
     }
 
 
-def generate_speculative_exact(target_model, scout_model, tokenizer, prompt, max_tokens, monitor, K=5):
+def generate_speculative_exact(target_model, scout_model, tokenizer, prompt, max_tokens, monitor, K=5, warmup_steps=WARMUP_STEPS):
     inputs = tokenizer(
         tokenizer.apply_chat_template([{"role": "user", "content": prompt}], tokenize=False, add_generation_prompt=True),
         return_tensors="pt"
@@ -131,6 +150,18 @@ def generate_speculative_exact(target_model, scout_model, tokenizer, prompt, max
     generated = []
     total_drafted = 0
     total_accepted = 0
+
+    # --- Warmup both scout and target (not timed, not recorded) ---
+    with torch.inference_mode():
+        warm_ids = current_ids.clone()
+        for _ in range(warmup_steps):
+            s_out = scout_model(warm_ids)
+            next_tok = torch.argmax(s_out.logits[:, -1, :], dim=-1, keepdim=True)
+            warm_ids = torch.cat([warm_ids, next_tok], dim=-1)
+        # Also warm the target model on the same grown sequence, mirroring the
+        # shape of a real verify pass (target sees a multi-token suffix).
+        _ = target_model(warm_ids)
+    torch.cuda.synchronize()
 
     torch.cuda.synchronize()
     t0 = time.perf_counter()
@@ -212,6 +243,7 @@ def main():
     print("=" * 85)
     print(f"[*] SPECULATIVE DECODING ACADEMIC BENCHMARK ({gpu_name})")
     print(f"[*] Target: {TARGET_MODEL_ID} | Scout: {SCOUT_MODEL_ID} | Trials: N={NUM_TRIALS}")
+    print(f"[*] Warmup steps per timed call: {WARMUP_STEPS} (untimed, not recorded)")
     print("=" * 85)
 
     tokenizer = AutoTokenizer.from_pretrained(TARGET_MODEL_ID)

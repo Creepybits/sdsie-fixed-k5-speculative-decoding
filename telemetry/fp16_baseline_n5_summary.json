@@ -1,0 +1,182 @@
+{
+  "Poem": {
+    "n_trials": 5,
+    "tps_mean": 44.312,
+    "tps_std": 0.4967252761839285,
+    "j_tok_mean": 9.1921878,
+    "j_tok_std": 0.44098381137515713,
+    "power_mean": 407.168,
+    "raw_trials": [
+      {
+        "timestamp": "2026-09-02T06:28:39.837022",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Poem_trial1",
+        "tokens": 250,
+        "throughput_tok_sec": 45.13,
+        "avg_power_watts": 375.5,
+        "total_energy_joules": 2080.132,
+        "joules_per_token": 8.320528
+      },
+      {
+        "timestamp": "2026-09-02T06:28:45.664515",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Poem_trial2",
+        "tokens": 250,
+        "throughput_tok_sec": 43.59,
+        "avg_power_watts": 404.88,
+        "total_energy_joules": 2321.9232,
+        "joules_per_token": 9.287693
+      },
+      {
+        "timestamp": "2026-09-02T06:28:51.422144",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Poem_trial3",
+        "tokens": 250,
+        "throughput_tok_sec": 44.12,
+        "avg_power_watts": 415.54,
+        "total_energy_joules": 2354.7389,
+        "joules_per_token": 9.418956
+      },
+      {
+        "timestamp": "2026-09-02T06:28:57.159532",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Poem_trial4",
+        "tokens": 250,
+        "throughput_tok_sec": 44.33,
+        "avg_power_watts": 418.64,
+        "total_energy_joules": 2360.8973,
+        "joules_per_token": 9.443589
+      },
+      {
+        "timestamp": "2026-09-02T06:29:02.883430",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Poem_trial5",
+        "tokens": 250,
+        "throughput_tok_sec": 44.39,
+        "avg_power_watts": 421.28,
+        "total_energy_joules": 2372.5433,
+        "joules_per_token": 9.490173
+      }
+    ]
+  },
+  "Physics": {
+    "n_trials": 5,
+    "tps_mean": 44.519999999999996,
+    "tps_std": 0.46475800154489016,
+    "j_tok_mean": 9.5462466,
+    "j_tok_std": 0.17419312051123062,
+    "power_mean": 424.93999999999994,
+    "raw_trials": [
+      {
+        "timestamp": "2026-09-02T06:29:08.485698",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Physics_trial1",
+        "tokens": 250,
+        "throughput_tok_sec": 45.43,
+        "avg_power_watts": 421.07,
+        "total_energy_joules": 2317.1576,
+        "joules_per_token": 9.26863
+      },
+      {
+        "timestamp": "2026-09-02T06:29:14.228234",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Physics_trial2",
+        "tokens": 250,
+        "throughput_tok_sec": 44.25,
+        "avg_power_watts": 417.52,
+        "total_energy_joules": 2359.0699,
+        "joules_per_token": 9.43628
+      },
+      {
+        "timestamp": "2026-09-02T06:29:19.954284",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Physics_trial3",
+        "tokens": 250,
+        "throughput_tok_sec": 44.37,
+        "avg_power_watts": 425.32,
+        "total_energy_joules": 2396.2153,
+        "joules_per_token": 9.584861
+      },
+      {
+        "timestamp": "2026-09-02T06:29:25.711708",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Physics_trial4",
+        "tokens": 250,
+        "throughput_tok_sec": 44.14,
+        "avg_power_watts": 428.7,
+        "total_energy_joules": 2427.8649,
+        "joules_per_token": 9.71146
+      },
+      {
+        "timestamp": "2026-09-02T06:29:31.434050",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Physics_trial5",
+        "tokens": 250,
+        "throughput_tok_sec": 44.41,
+        "avg_power_watts": 432.09,
+        "total_energy_joules": 2432.5004,
+        "joules_per_token": 9.730002
+      }
+    ]
+  },
+  "Code": {
+    "n_trials": 5,
+    "tps_mean": 44.432,
+    "tps_std": 0.6373507668466395,
+    "j_tok_mean": 9.732836399999998,
+    "j_tok_std": 0.12765486328785147,
+    "power_mean": 432.378,
+    "raw_trials": [
+      {
+        "timestamp": "2026-09-02T06:29:37.246568",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Code_trial1",
+        "tokens": 250,
+        "throughput_tok_sec": 43.72,
+        "avg_power_watts": 423.63,
+        "total_energy_joules": 2422.4651,
+        "joules_per_token": 9.68986
+      },
+      {
+        "timestamp": "2026-09-02T06:29:42.832440",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Code_trial2",
+        "tokens": 250,
+        "throughput_tok_sec": 45.5,
+        "avg_power_watts": 433.63,
+        "total_energy_joules": 2382.7808,
+        "joules_per_token": 9.531123
+      },
+      {
+        "timestamp": "2026-09-02T06:29:48.504915",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Code_trial3",
+        "tokens": 250,
+        "throughput_tok_sec": 44.79,
+        "avg_power_watts": 434.95,
+        "total_energy_joules": 2427.7043,
+        "joules_per_token": 9.710817
+      },
+      {
+        "timestamp": "2026-09-02T06:29:54.267895",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Code_trial4",
+        "tokens": 250,
+        "throughput_tok_sec": 44.09,
+        "avg_power_watts": 433.3,
+        "total_energy_joules": 2457.0416,
+        "joules_per_token": 9.828166
+      },
+      {
+        "timestamp": "2026-09-02T06:30:00.035516",
+        "category": "FP16 Baseline (matched harness)",
+        "prompt_label": "Code_trial5",
+        "tokens": 250,
+        "throughput_tok_sec": 44.06,
+        "avg_power_watts": 436.38,
+        "total_energy_joules": 2476.0541,
+        "joules_per_token": 9.904216
+      }
+    ]
+  }
+}
