@@ -6,56 +6,12 @@ This is the source of the paper-worthy numbers: up to 1.82x speedup and
 32.6-60.3% energy reduction vs. FP16 baseline, 100% output fidelity,
 N=10 trials/prompt. See README.md for the exact reported results.
 
-============================================================================
-CHANGES (2026-09-0X): ported the new_fp16_baseline.py fixes
-============================================================================
-Prior versions of this script (see the 2026-09-02 warmup fix noted below)
-still had a structural confound the status file flagged as a priority: for
-each prompt, all NUM_TRIALS baseline trials ran before any speculative
-trials did. That means baseline was systematically measured during the
-"cooler/earlier" part of each prompt's block and speculative during the
-"warmer/later" part -- exactly the kind of GPU thermal settling transient
-diagnosed and fixed in new_fp16_baseline.py (~40s time constant, ~120s to
-steady state). A speed/power difference produced partly by that transient
-would show up as though it were a property of the two decoding methods.
-
-Fixed here by pulling in bench_common.py (shared with speculative_scout.py,
-factored out of new_fp16_baseline.py):
-  1. Closed-loop thermal warmup (bench_common.warm_to_steady_state) before
-     any timed trial, alternating baseline/speculative warmup work so both
-     code paths are hot (kernels compiled, caches primed) before the timed
-     region starts. This replaces relying on the per-trial 5-step warmup
-     alone to compensate for the multi-minute settling transient.
-  2. Fully interleaved trial order: each trial round runs Poem, Physics,
-     Code, and for each prompt, baseline and speculative back-to-back --
-     alternating which of the pair goes first each round, so neither
-     condition is systematically first (and therefore systematically
-     cooler) across the run. This is the direct fix for the confound above.
-  3. Energy from the NVML hardware energy counter, with the old
-     avg_power_watts * elapsed method kept as a recorded cross-check.
-  4. Per-trial thermal telemetry (temperature, clocks, throttle reasons)
-     written to a new per-trial CSV (telemetry_ablation.csv), and drift
-     diagnostics (least-squares slope of power/J-per-token/throughput
-     against chronological trial index) computed per condition and pooled,
-     the same way new_fp16_baseline.py does -- so a bad run is visible in
-     the numbers themselves instead of assumed clean.
-  5. bench_common.safe_append_csv / json_safe guard against the CSV
-     schema-collision and numpy.bool_ JSON-serialization bugs found and
-     fixed in new_fp16_baseline.py on 2026-09-03.
-
 ablation_results.json's top-level shape (fidelity_by_prompt + ablation dict
 keyed "FP16 Baseline" / "Speculative (1B->8B)") is unchanged, so
 plot_ablation_results.py keeps working without modification. The new
 drift/warmup/device info is added under a new "_meta" key that the plot
 script doesn't read.
 
-Methodology note (2026-09-02, retained from the previous version): both
-condition functions run WARMUP_STEPS untimed forward passes immediately
-before each timed measurement, matching fp16_baseline.py's per-trial warmup
-procedure. This is on top of, not instead of, the closed-loop warmup added
-above -- the per-trial warmup avoids each individual timed window starting
-from an idle SM; the closed-loop warmup handles the much slower multi-minute
-thermal settling transient.
 """
 
 import argparse
