@@ -1,2 +1,0 @@
-timestamp,category,tokens,throughput_tok_sec,avg_power_watts,total_energy_joules,joules_per_token,accept_rate_pct,reject_rate_pct
-2026-09-02T06:28:10.104169,Speculative Scout (1B->8B),81,32.52,94.67,235.7992,2.911101,50.4,49.6
