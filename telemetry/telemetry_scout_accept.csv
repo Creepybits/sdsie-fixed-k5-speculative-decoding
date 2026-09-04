@@ -1,0 +1,4 @@
+timestamp,category,prompt_label,tokens,cycles,throughput_tok_sec,avg_power_watts,min_power_watts,max_power_watts,total_energy_joules,energy_source,energy_j_counter,energy_j_sampled,joules_per_token,accept_rate_pct,reject_rate_pct,temp_start_c,temp_end_c,temp_max_c,sm_clock_mean_mhz,mem_clock_mean_mhz,throttle_reasons,n_power_samples,effective_sample_hz,prompt_tokens,K,max_tokens_config
+2026-09-04T11:39:48.158638,Speculative Scout (1B->8B),Poem,250,81,41.42,311.09,224.08,430.53,1942.79,nvml_counter,1942.79,1874.1624,7.77116,42.5,57.5,49,57,57,2847.9,13801.0,0,603,99.9,48,5,250
+2026-09-04T11:39:53.264482,Speculative Scout (1B->8B),Physics,250,70,49.02,355.81,263.27,441.57,1754.575,nvml_counter,1754.575,1812.3957,7.0183,51.7,48.3,57,58,58,2843.5,13801.0,0,510,100.0,49,5,250
+2026-09-04T11:39:56.848065,Speculative Scout (1B->8B),Code,250,48,69.88,345.39,276.76,441.57,1178.511,nvml_counter,1178.511,1232.3252,4.714044,85.4,14.6,58,56,58,2843.5,13801.0,0,358,100.1,49,5,250

@@ -1,0 +1,772 @@
+{
+  "fidelity_by_prompt": {
+    "prompt_1": 100.0,
+    "prompt_2": 100.0,
+    "prompt_3": 100.0
+  },
+  "ablation": {
+    "prompt_1": {
+      "FP16 Baseline": {
+        "tps_mean": 38.417,
+        "tps_std": 0.18482694608741454,
+        "j_tok_mean": 11.659664,
+        "j_tok_std": 0.10785495979323317,
+        "power_mean": 468.73100000000005
+      },
+      "Speculative (1B->8B)": {
+        "tps_mean": 40.983000000000004,
+        "tps_std": 0.34620947416268094,
+        "j_tok_mean": 7.905633999999999,
+        "j_tok_std": 0.10066465736493604,
+        "power_mean": 344.11400000000003,
+        "accept_rate_pct_mean": 42.470000000000006
+      }
+    },
+    "prompt_2": {
+      "FP16 Baseline": {
+        "tps_mean": 38.451,
+        "tps_std": 0.501745951652826,
+        "j_tok_mean": 11.644486400000002,
+        "j_tok_std": 0.1058113792020496,
+        "power_mean": 465.75199999999995
+      },
+      "Speculative (1B->8B)": {
+        "tps_mean": 47.032,
+        "tps_std": 0.4170323728441232,
+        "j_tok_mean": 7.1834147999999995,
+        "j_tok_std": 0.11596850521482115,
+        "power_mean": 362.608,
+        "accept_rate_pct_mean": 51.71
+      }
+    },
+    "prompt_3": {
+      "FP16 Baseline": {
+        "tps_mean": 38.897,
+        "tps_std": 0.6715511894114998,
+        "j_tok_mean": 11.659348,
+        "j_tok_std": 0.11691652250730013,
+        "power_mean": 466.69000000000005
+      },
+      "Speculative (1B->8B)": {
+        "tps_mean": 69.43799999999999,
+        "tps_std": 0.7251317121737274,
+        "j_tok_mean": 4.739640799999999,
+        "j_tok_std": 0.09182860753033333,
+        "power_mean": 354.32500000000005,
+        "accept_rate_pct_mean": 85.41999999999999
+      }
+    }
+  },
+  "_meta": {
+    "timestamp": "2026-09-04T12:08:48.058561",
+    "device": {
+      "device_index": 0,
+      "energy_counter_supported": true,
+      "name": "NVIDIA GeForce RTX 5090",
+      "driver_version": "610.88",
+      "power_limit_w": 600.0,
+      "max_sm_clock_mhz": 3090,
+      "max_mem_clock_mhz": 14001
+    },
+    "config": {
+      "target_model": "meta-llama/Llama-3.1-8B-Instruct",
+      "scout_model": "meta-llama/Llama-3.2-1B-Instruct",
+      "K": 5,
+      "max_tokens": 250,
+      "num_trials": 10,
+      "warmup_steps_per_trial": 5,
+      "clocks_locked": false,
+      "trial_order": "interleaved: category round-robin, condition alternated each round"
+    },
+    "warmup": {
+      "converged": false,
+      "elapsed_sec": 422.8,
+      "iterations": 73,
+      "trace": [
+        {
+          "iteration": 1,
+          "label": "Poem/base",
+          "elapsed_sec": 7.1,
+          "mean_power_w": 370.92,
+          "temp_c": 53,
+          "sm_clock_mean_mhz": 2735.7
+        },
+        {
+          "iteration": 2,
+          "label": "Physics/spec",
+          "elapsed_sec": 12.55,
+          "mean_power_w": 351.53,
+          "temp_c": 53,
+          "sm_clock_mean_mhz": 2852.1
+        },
+        {
+          "iteration": 3,
+          "label": "Code/base",
+          "elapsed_sec": 19.08,
+          "mean_power_w": 455.96,
+          "temp_c": 56,
+          "sm_clock_mean_mhz": 2845.1
+        },
+        {
+          "iteration": 4,
+          "label": "Poem/spec",
+          "elapsed_sec": 25.14,
+          "mean_power_w": 346.89,
+          "temp_c": 54,
+          "sm_clock_mean_mhz": 2848.5
+        },
+        {
+          "iteration": 5,
+          "label": "Physics/base",
+          "elapsed_sec": 31.69,
+          "mean_power_w": 459.73,
+          "temp_c": 58,
+          "sm_clock_mean_mhz": 2843.5
+        },
+        {
+          "iteration": 6,
+          "label": "Code/spec",
+          "elapsed_sec": 35.3,
+          "mean_power_w": 358.28,
+          "temp_c": 57,
+          "sm_clock_mean_mhz": 2847.6
+        },
+        {
+          "iteration": 7,
+          "label": "Poem/base",
+          "elapsed_sec": 41.8,
+          "mean_power_w": 460.36,
+          "temp_c": 60,
+          "sm_clock_mean_mhz": 2841.2
+        },
+        {
+          "iteration": 8,
+          "label": "Physics/spec",
+          "elapsed_sec": 47.23,
+          "mean_power_w": 361.91,
+          "temp_c": 57,
+          "sm_clock_mean_mhz": 2843.8
+        },
+        {
+          "iteration": 9,
+          "label": "Code/base",
+          "elapsed_sec": 53.81,
+          "mean_power_w": 460.77,
+          "temp_c": 61,
+          "sm_clock_mean_mhz": 2840.7
+        },
+        {
+          "iteration": 10,
+          "label": "Poem/spec",
+          "elapsed_sec": 59.86,
+          "mean_power_w": 353.54,
+          "temp_c": 59,
+          "sm_clock_mean_mhz": 2844.2
+        },
+        {
+          "iteration": 11,
+          "label": "Physics/base",
+          "elapsed_sec": 66.32,
+          "mean_power_w": 463.1,
+          "temp_c": 62,
+          "sm_clock_mean_mhz": 2838.5
+        },
+        {
+          "iteration": 12,
+          "label": "Code/spec",
+          "elapsed_sec": 69.91,
+          "mean_power_w": 355.24,
+          "temp_c": 61,
+          "sm_clock_mean_mhz": 2841.1
+        },
+        {
+          "iteration": 13,
+          "label": "Poem/base",
+          "elapsed_sec": 76.48,
+          "mean_power_w": 459.41,
+          "temp_c": 62,
+          "sm_clock_mean_mhz": 2837.3
+        },
+        {
+          "iteration": 14,
+          "label": "Physics/spec",
+          "elapsed_sec": 81.95,
+          "mean_power_w": 363.49,
+          "temp_c": 59,
+          "sm_clock_mean_mhz": 2842.2
+        },
+        {
+          "iteration": 15,
+          "label": "Code/base",
+          "elapsed_sec": 88.54,
+          "mean_power_w": 461.91,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2838.7
+        },
+        {
+          "iteration": 16,
+          "label": "Poem/spec",
+          "elapsed_sec": 94.56,
+          "mean_power_w": 353.79,
+          "temp_c": 60,
+          "sm_clock_mean_mhz": 2842.3
+        },
+        {
+          "iteration": 17,
+          "label": "Physics/base",
+          "elapsed_sec": 101.14,
+          "mean_power_w": 466.79,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2839.0
+        },
+        {
+          "iteration": 18,
+          "label": "Code/spec",
+          "elapsed_sec": 104.7,
+          "mean_power_w": 364.08,
+          "temp_c": 58,
+          "sm_clock_mean_mhz": 2842.3
+        },
+        {
+          "iteration": 19,
+          "label": "Poem/base",
+          "elapsed_sec": 111.35,
+          "mean_power_w": 458.89,
+          "temp_c": 61,
+          "sm_clock_mean_mhz": 2838.2
+        },
+        {
+          "iteration": 20,
+          "label": "Physics/spec",
+          "elapsed_sec": 116.73,
+          "mean_power_w": 364.63,
+          "temp_c": 61,
+          "sm_clock_mean_mhz": 2841.9
+        },
+        {
+          "iteration": 21,
+          "label": "Code/base",
+          "elapsed_sec": 123.26,
+          "mean_power_w": 466.08,
+          "temp_c": 62,
+          "sm_clock_mean_mhz": 2838.4
+        },
+        {
+          "iteration": 22,
+          "label": "Poem/spec",
+          "elapsed_sec": 129.25,
+          "mean_power_w": 354.85,
+          "temp_c": 60,
+          "sm_clock_mean_mhz": 2841.5
+        },
+        {
+          "iteration": 23,
+          "label": "Physics/base",
+          "elapsed_sec": 135.82,
+          "mean_power_w": 467.43,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2837.8
+        },
+        {
+          "iteration": 24,
+          "label": "Code/spec",
+          "elapsed_sec": 139.38,
+          "mean_power_w": 360.92,
+          "temp_c": 59,
+          "sm_clock_mean_mhz": 2843.6
+        },
+        {
+          "iteration": 25,
+          "label": "Poem/base",
+          "elapsed_sec": 145.92,
+          "mean_power_w": 466.02,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2839.4
+        },
+        {
+          "iteration": 26,
+          "label": "Physics/spec",
+          "elapsed_sec": 151.16,
+          "mean_power_w": 368.15,
+          "temp_c": 61,
+          "sm_clock_mean_mhz": 2841.3
+        },
+        {
+          "iteration": 27,
+          "label": "Code/base",
+          "elapsed_sec": 157.66,
+          "mean_power_w": 468.57,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2837.6
+        },
+        {
+          "iteration": 28,
+          "label": "Poem/spec",
+          "elapsed_sec": 163.77,
+          "mean_power_w": 353.97,
+          "temp_c": 59,
+          "sm_clock_mean_mhz": 2841.3
+        },
+        {
+          "iteration": 29,
+          "label": "Physics/base",
+          "elapsed_sec": 170.18,
+          "mean_power_w": 469.73,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2838.6
+        },
+        {
+          "iteration": 30,
+          "label": "Code/spec",
+          "elapsed_sec": 173.8,
+          "mean_power_w": 363.16,
+          "temp_c": 61,
+          "sm_clock_mean_mhz": 2841.7
+        },
+        {
+          "iteration": 31,
+          "label": "Poem/base",
+          "elapsed_sec": 180.35,
+          "mean_power_w": 466.11,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2839.7
+        },
+        {
+          "iteration": 32,
+          "label": "Physics/spec",
+          "elapsed_sec": 185.7,
+          "mean_power_w": 369.87,
+          "temp_c": 60,
+          "sm_clock_mean_mhz": 2842.7
+        },
+        {
+          "iteration": 33,
+          "label": "Code/base",
+          "elapsed_sec": 192.25,
+          "mean_power_w": 469.03,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2839.9
+        },
+        {
+          "iteration": 34,
+          "label": "Poem/spec",
+          "elapsed_sec": 198.36,
+          "mean_power_w": 353.9,
+          "temp_c": 61,
+          "sm_clock_mean_mhz": 2840.0
+        },
+        {
+          "iteration": 35,
+          "label": "Physics/base",
+          "elapsed_sec": 204.67,
+          "mean_power_w": 469.81,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2840.3
+        },
+        {
+          "iteration": 36,
+          "label": "Code/spec",
+          "elapsed_sec": 208.29,
+          "mean_power_w": 363.54,
+          "temp_c": 59,
+          "sm_clock_mean_mhz": 2841.9
+        },
+        {
+          "iteration": 37,
+          "label": "Poem/base",
+          "elapsed_sec": 214.82,
+          "mean_power_w": 465.85,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2840.6
+        },
+        {
+          "iteration": 38,
+          "label": "Physics/spec",
+          "elapsed_sec": 220.16,
+          "mean_power_w": 368.65,
+          "temp_c": 59,
+          "sm_clock_mean_mhz": 2841.8
+        },
+        {
+          "iteration": 39,
+          "label": "Code/base",
+          "elapsed_sec": 226.71,
+          "mean_power_w": 469.3,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2840.3
+        },
+        {
+          "iteration": 40,
+          "label": "Poem/spec",
+          "elapsed_sec": 232.7,
+          "mean_power_w": 355.38,
+          "temp_c": 59,
+          "sm_clock_mean_mhz": 2841.7
+        },
+        {
+          "iteration": 41,
+          "label": "Physics/base",
+          "elapsed_sec": 239.02,
+          "mean_power_w": 468.37,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2836.2
+        },
+        {
+          "iteration": 42,
+          "label": "Code/spec",
+          "elapsed_sec": 242.64,
+          "mean_power_w": 364.11,
+          "temp_c": 60,
+          "sm_clock_mean_mhz": 2841.2
+        },
+        {
+          "iteration": 43,
+          "label": "Poem/base",
+          "elapsed_sec": 249.2,
+          "mean_power_w": 465.5,
+          "temp_c": 62,
+          "sm_clock_mean_mhz": 2838.6
+        },
+        {
+          "iteration": 44,
+          "label": "Physics/spec",
+          "elapsed_sec": 254.57,
+          "mean_power_w": 368.55,
+          "temp_c": 61,
+          "sm_clock_mean_mhz": 2841.1
+        },
+        {
+          "iteration": 45,
+          "label": "Code/base",
+          "elapsed_sec": 261.12,
+          "mean_power_w": 468.79,
+          "temp_c": 62,
+          "sm_clock_mean_mhz": 2841.1
+        },
+        {
+          "iteration": 46,
+          "label": "Poem/spec",
+          "elapsed_sec": 267.07,
+          "mean_power_w": 355.67,
+          "temp_c": 60,
+          "sm_clock_mean_mhz": 2839.6
+        },
+        {
+          "iteration": 47,
+          "label": "Physics/base",
+          "elapsed_sec": 273.63,
+          "mean_power_w": 467.93,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2838.0
+        },
+        {
+          "iteration": 48,
+          "label": "Code/spec",
+          "elapsed_sec": 277.25,
+          "mean_power_w": 362.63,
+          "temp_c": 60,
+          "sm_clock_mean_mhz": 2839.0
+        },
+        {
+          "iteration": 49,
+          "label": "Poem/base",
+          "elapsed_sec": 283.78,
+          "mean_power_w": 466.95,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2839.8
+        },
+        {
+          "iteration": 50,
+          "label": "Physics/spec",
+          "elapsed_sec": 289.11,
+          "mean_power_w": 369.81,
+          "temp_c": 59,
+          "sm_clock_mean_mhz": 2843.2
+        },
+        {
+          "iteration": 51,
+          "label": "Code/base",
+          "elapsed_sec": 295.66,
+          "mean_power_w": 468.77,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2840.3
+        },
+        {
+          "iteration": 52,
+          "label": "Poem/spec",
+          "elapsed_sec": 301.4,
+          "mean_power_w": 357.91,
+          "temp_c": 59,
+          "sm_clock_mean_mhz": 2840.2
+        },
+        {
+          "iteration": 53,
+          "label": "Physics/base",
+          "elapsed_sec": 307.96,
+          "mean_power_w": 469.04,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2836.0
+        },
+        {
+          "iteration": 54,
+          "label": "Code/spec",
+          "elapsed_sec": 311.59,
+          "mean_power_w": 363.34,
+          "temp_c": 60,
+          "sm_clock_mean_mhz": 2838.8
+        },
+        {
+          "iteration": 55,
+          "label": "Poem/base",
+          "elapsed_sec": 318.13,
+          "mean_power_w": 466.59,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2837.1
+        },
+        {
+          "iteration": 56,
+          "label": "Physics/spec",
+          "elapsed_sec": 323.5,
+          "mean_power_w": 368.66,
+          "temp_c": 59,
+          "sm_clock_mean_mhz": 2841.3
+        },
+        {
+          "iteration": 57,
+          "label": "Code/base",
+          "elapsed_sec": 330.18,
+          "mean_power_w": 461.33,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2839.3
+        },
+        {
+          "iteration": 58,
+          "label": "Poem/spec",
+          "elapsed_sec": 336.4,
+          "mean_power_w": 346.94,
+          "temp_c": 60,
+          "sm_clock_mean_mhz": 2840.9
+        },
+        {
+          "iteration": 59,
+          "label": "Physics/base",
+          "elapsed_sec": 342.99,
+          "mean_power_w": 466.35,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2837.3
+        },
+        {
+          "iteration": 60,
+          "label": "Code/spec",
+          "elapsed_sec": 346.65,
+          "mean_power_w": 357.34,
+          "temp_c": 60,
+          "sm_clock_mean_mhz": 2839.9
+        },
+        {
+          "iteration": 61,
+          "label": "Poem/base",
+          "elapsed_sec": 353.27,
+          "mean_power_w": 459.64,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2837.4
+        },
+        {
+          "iteration": 62,
+          "label": "Physics/spec",
+          "elapsed_sec": 358.73,
+          "mean_power_w": 361.67,
+          "temp_c": 61,
+          "sm_clock_mean_mhz": 2842.3
+        },
+        {
+          "iteration": 63,
+          "label": "Code/base",
+          "elapsed_sec": 365.36,
+          "mean_power_w": 460.16,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2837.7
+        },
+        {
+          "iteration": 64,
+          "label": "Poem/spec",
+          "elapsed_sec": 371.46,
+          "mean_power_w": 350.46,
+          "temp_c": 59,
+          "sm_clock_mean_mhz": 2840.7
+        },
+        {
+          "iteration": 65,
+          "label": "Physics/base",
+          "elapsed_sec": 378.05,
+          "mean_power_w": 465.88,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2838.6
+        },
+        {
+          "iteration": 66,
+          "label": "Code/spec",
+          "elapsed_sec": 381.64,
+          "mean_power_w": 364.14,
+          "temp_c": 58,
+          "sm_clock_mean_mhz": 2839.2
+        },
+        {
+          "iteration": 67,
+          "label": "Poem/base",
+          "elapsed_sec": 388.1,
+          "mean_power_w": 463.72,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2838.3
+        },
+        {
+          "iteration": 68,
+          "label": "Physics/spec",
+          "elapsed_sec": 393.36,
+          "mean_power_w": 367.12,
+          "temp_c": 61,
+          "sm_clock_mean_mhz": 2839.8
+        },
+        {
+          "iteration": 69,
+          "label": "Code/base",
+          "elapsed_sec": 399.91,
+          "mean_power_w": 465.63,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2834.3
+        },
+        {
+          "iteration": 70,
+          "label": "Poem/spec",
+          "elapsed_sec": 406.02,
+          "mean_power_w": 351.85,
+          "temp_c": 59,
+          "sm_clock_mean_mhz": 2841.3
+        },
+        {
+          "iteration": 71,
+          "label": "Physics/base",
+          "elapsed_sec": 412.6,
+          "mean_power_w": 466.25,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2839.2
+        },
+        {
+          "iteration": 72,
+          "label": "Code/spec",
+          "elapsed_sec": 416.21,
+          "mean_power_w": 360.97,
+          "temp_c": 59,
+          "sm_clock_mean_mhz": 2842.6
+        },
+        {
+          "iteration": 73,
+          "label": "Poem/base",
+          "elapsed_sec": 422.8,
+          "mean_power_w": 464.22,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2839.3
+        }
+      ]
+    },
+    "drift_diagnostics": {
+      "pooled": {
+        "power_w": {
+          "slope_per_trial": -0.03682245068074564,
+          "r2": 0.00012499234333129827,
+          "total_change_over_run": -2.172524590163993,
+          "fraction_of_mean": -0.005294062894860718,
+          "n": 60
+        },
+        "joules_per_token": {
+          "slope_per_trial": -0.003617620894693019,
+          "r2": 0.0005382765946548851,
+          "total_change_over_run": -0.21343963278688813,
+          "fraction_of_mean": -0.023372634739852488,
+          "n": 60
+        },
+        "throughput_tok_sec": {
+          "slope_per_trial": 0.027701583773270158,
+          "r2": 0.0018641020312470946,
+          "total_change_over_run": 1.6343934426229394,
+          "fraction_of_mean": 0.03589207393267514,
+          "n": 60
+        },
+        "temp_c": {
+          "slope_per_trial": -0.0025840511253132597,
+          "r2": 0.0007965421102229531,
+          "total_change_over_run": -0.15245901639348233,
+          "fraction_of_mean": -0.0024810254905367345,
+          "n": 60
+        },
+        "residual_drift_acceptable": false,
+        "threshold_fraction": 0.005
+      },
+      "baseline_only": {
+        "power_w": {
+          "slope_per_trial": -0.03773259972489867,
+          "r2": 0.039354389572329174,
+          "total_change_over_run": -2.2262233837690215,
+          "fraction_of_mean": -0.004766485045962965,
+          "n": 30
+        },
+        "joules_per_token": {
+          "slope_per_trial": 0.0018930280055020202,
+          "r2": 0.08885880170532712,
+          "total_change_over_run": 0.11168865232461919,
+          "fraction_of_mean": 0.009583307515184394,
+          "n": 30
+        },
+        "throughput_tok_sec": {
+          "slope_per_trial": -0.004806052269601037,
+          "r2": 0.023842424350972946,
+          "total_change_over_run": -0.28355708390646117,
+          "fraction_of_mean": -0.007348259419681106,
+          "n": 30
+        },
+        "temp_c": {
+          "slope_per_trial": -0.0024759284731772037,
+          "r2": 0.011852849073720084,
+          "total_change_over_run": -0.14607977991745502,
+          "fraction_of_mean": -0.002322413035253657,
+          "n": 30
+        },
+        "residual_drift_acceptable": true,
+        "threshold_fraction": 0.005
+      },
+      "speculative_only": {
+        "power_w": {
+          "slope_per_trial": -0.035893909626716826,
+          "r2": 0.005549308918268769,
+          "total_change_over_run": -2.045952848722859,
+          "fraction_of_mean": -0.005784718816573231,
+          "n": 30
+        },
+        "joules_per_token": {
+          "slope_per_trial": -0.009239627280381666,
+          "r2": 0.013731974753958598,
+          "total_change_over_run": -0.526658754981755,
+          "fraction_of_mean": -0.07968132523216587,
+          "n": 30
+        },
+        "throughput_tok_sec": {
+          "slope_per_trial": 0.06086612405276493,
+          "r2": 0.00732906489554308,
+          "total_change_over_run": 3.469369071007601,
+          "fraction_of_mean": 0.06610294635874074,
+          "n": 30
+        },
+        "temp_c": {
+          "slope_per_trial": -0.0026943586865001874,
+          "r2": 0.00323323042379986,
+          "total_change_over_run": -0.1535784451305107,
+          "fraction_of_mean": -0.0025596407521751782,
+          "n": 30
+        },
+        "residual_drift_acceptable": false,
+        "threshold_fraction": 0.005
+      }
+    },
+    "poll_errors": 0
+  }
+}

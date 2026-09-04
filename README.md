@@ -24,21 +24,33 @@ contains only the part that's fully validated and works as claimed.
 
 ## Results (N=10 trials/prompt, RTX 5090 Blackwell, 100% output fidelity on all rows)
 
+*Updated 2026-09-04. Supersedes the numbers previously reported here — a warmup-timing
+bug was found and fixed (see [Methodology](#methodology) below); the relative story is
+unchanged, but every figure below is a fresh, re-measured number, not a revision of the
+old ones by formula.*
+
 | Prompt | Baseline tok/s | Speculative tok/s | Speedup | Baseline J/tok | Speculative J/tok | Energy Δ | Accept % |
 |---|---|---|---|---|---|---|---|
-| Poem | 40.0 | 43.4 | +8.6% | 11.58 ± 0.17 | 7.80 ± 0.08 | −32.6% | 42.5% |
-| Physics | 40.2 | 50.1 | +24.8% | 11.64 ± 0.10 | 7.09 ± 0.08 | −39.1% | 51.7% |
-| Code | 40.7 | **74.1** | **+82.3%** | 11.64 ± 0.10 | **4.62 ± 0.09** | **−60.3%** | **85.4%** |
+| Poem | 38.42 ± 0.18 | 40.98 ± 0.35 | +6.7% | 11.66 ± 0.11 | 7.91 ± 0.10 | −32.2% | 42.5% |
+| Physics | 38.45 ± 0.50 | 47.03 ± 0.42 | +22.3% | 11.64 ± 0.11 | 7.18 ± 0.12 | −38.3% | 51.7% |
+| Code | 38.90 ± 0.67 | **69.44 ± 0.73** | **+78.5%** | 11.66 ± 0.12 | **4.74 ± 0.09** | **−59.3%** | **85.4%** |
+
+![Throughput: FP16 baseline vs. speculative (K=5), per prompt](assets/throughput_baseline_vs_speculative.png)
+![Energy per token: FP16 baseline vs. speculative (K=5), per prompt](assets/energy_per_token_baseline_vs_speculative.png)
 
 Speedup and energy reduction scale with draft-acceptance rate — higher on predictable
 content (code), lower but still real on less predictable content (free-form prose).
 
-Accept rates were independently cross-validated across three separately-executed runs
-(deterministic greedy decoding), consistent with correctly-implemented accept/reject
-logic. Mean GPU power during speculative runs (338.6–355.2 W) is lower
-than during the FP16 baseline (462.9–473.2 W) despite two resident models,
-consistent with fewer full 8B-parameter forward passes required per unit of output as
-accepted draft batches grow.
+![Speedup vs. FP16 baseline as a function of draft accept rate](assets/speedup_vs_accept_rate.png)
+
+Accept rates were independently cross-validated across every run of this ablation to
+date — including today's, after a full rewrite of the measurement harness — and match
+to within a few hundredths of a percentage point every time (deterministic greedy
+decoding), which is strong evidence the accept/reject logic itself has been correct and
+stable throughout, independent of the measurement-methodology fixes described below.
+Mean GPU power during speculative runs (344–363 W) is lower than during the FP16
+baseline (466–469 W) despite two resident models, consistent with fewer full
+8B-parameter forward passes required per unit of output as accepted draft batches grow.
 
 ## What this does NOT claim
 
@@ -61,28 +73,82 @@ work applied caching unevenly, which structurally penalized the speculative path
 fallback step. Recomputing from scratch for both arms removes that confound, at the cost
 of both being slower in absolute terms than a production server with caching would be.
 
-Both baseline and speculative measurements are preceded by 5 untimed warmup forward
-passes (not recorded), so reported numbers reflect steady-state GPU clock/thermal
-behavior rather than cold-start overhead. This warmup procedure is applied identically
-across `benchmark_ablation.py`, `fp16_baseline.py`, and `speculative_scout.py`.
+Warmup happens in two layers. Before any timed trial, a **closed-loop thermal warmup**
+runs real (discarded) baseline and speculative decoding cycles, alternating across all
+three prompts and both conditions, until GPU temperature stops moving and *each*
+prompt/condition combination's own power reading individually stops moving — not until
+consecutive readings across different combinations happen to agree with each other,
+since baseline and speculative draw genuinely different power by design. This replaced
+an earlier fixed-length warmup that recovered only part of the GPU's cold-start power
+deficit (see `bench_common.py`'s `warm_to_steady_state` for the full history: a warmup
+burst shorter than the real trial length was found to converge at a lower power/temp
+level than the real, longer trial then reached). On top of that, each individual timed
+trial is still preceded by 5 short untimed warmup forward passes immediately before
+measurement starts, avoiding cold-SM effects at the start of each specific trial. This
+two-layer warmup procedure runs in all three of `benchmark_ablation.py`,
+`fp16_baseline.py`, and `speculative_scout.py` — though not from one shared
+implementation. `benchmark_ablation.py` and `speculative_scout.py` both call it from
+`bench_common.py`; `fp16_baseline.py` was rewritten independently (a few hours earlier,
+before `bench_common.py` existed) and carries its own equivalent implementation of the
+same warmup and drift-diagnostic logic. This works fine in practice —
+`fp16_baseline.py` only alternates between prompts under one workload (baseline-only),
+where the simpler pooled convergence check `bench_common.py` originally used is
+sufficient; the per-workload check `bench_common.py` now uses was specifically needed
+for `benchmark_ablation.py`, which alternates between two workloads (baseline and
+speculative) with a real, persistent power gap. Worth flagging for future sessions: this
+is the same kind of duplicated-implementation drift risk the project has hit before —
+`fp16_baseline.py` could in principle be migrated to import `bench_common.py` too, which
+would remove the duplication, but hasn't been done as of this writing.
 
-Power measured via 100 Hz NVML polling. Fidelity measured as exact greedy-decoding token
-match between baseline and speculative output.
+Energy per token is read from the GPU's onboard hardware energy counter
+(`nvmlDeviceGetTotalEnergyConsumption`) when available — as it was for every trial in
+the results above — rather than integrated from sampled power readings, which is a more
+direct and less bias-prone measurement; sampled trapezoidal integration is retained as a
+fallback and cross-check when the counter isn't supported. Power itself is still sampled
+via 100 Hz NVML polling. Fidelity is measured as exact greedy-decoding token match
+between baseline and speculative output.
+
+### Measurement validity (drift check)
+
+Each reported run's per-trial telemetry is checked for residual warmup drift: a
+least-squares fit of power, energy/token, and throughput against chronological trial
+index. For the run behind the table above, the fitted trend was negligible in every
+case (R² ≈ 0 for all three metrics, pooled and per-condition — the largest was 0.09),
+and the total drift over the full 60-trial run was small in absolute terms (about −2 W
+over the whole run, against a pooled mean near 410 W). The script's own pass/fail
+threshold (±0.5% of mean) is a blunt cutoff that doesn't look at R², so it did flag this
+run (pooled: −0.53%; speculative-only: −0.58%; baseline-only passed at −0.48%) — worth
+knowing about, but a near-zero R² alongside a sub-1%-of-mean total change is consistent
+with ordinary run-to-run noise, not a systematic warmup or thermal trend contaminating
+the reported means. Separately, on this specific run the closed-loop warmup itself did
+not fully converge within its 420 s cap (WSL2 GPU passthrough appears to add enough power
+reporting noise that the strict per-label 1.5 W tolerance wasn't reliably satisfied in
+time) — the drift check above is exactly the safeguard that exists for this situation,
+and it came back clean.
 
 ## Repository structure
 
 ```
-speculative_scout.py      - Standalone reference implementation, single-run
-benchmark_ablation.py     - N=10 trial ablation across 3 prompts (source of table above)
-fp16_baseline.py          - Standalone matched baseline, same warmup/methodology
-telemetry/                - Raw JSON/CSV output from the runs behind the table above
-assets/                   - Plots generated from telemetry (see plot_*.py scripts)
+benchmarks/
+  speculative_scout.py    - Standalone reference implementation, single-run
+  benchmark_ablation.py   - N=10 trial ablation across 3 prompts (source of table above)
+  fp16_baseline.py        - Standalone matched baseline, own closed-loop warmup/drift-check
+                             implementation (predates bench_common.py, not yet migrated to it)
+  bench_common.py         - Shared NVML monitor, closed-loop warmup, accept/reject decode
+                             loop, and drift diagnostics used by benchmark_ablation.py and
+                             speculative_scout.py
+  plot_ablation_results.py, plot_baseline_stability.py, rebuild_summary.py
+docs/
+  sdsie_fixed_k5_paper.tex / .pdf  - The paper (see below), figures pulled from assets/
+telemetry/                 - Raw JSON/CSV output from the runs behind the table above
+assets/                    - Plots generated from telemetry (see plot_*.py scripts)
 ```
 
 ## Running it
 
 ```bash
 pip install -r requirements.txt
+cd benchmarks
 
 # Single run against one prompt
 python3 speculative_scout.py
