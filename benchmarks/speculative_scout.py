@@ -5,65 +5,6 @@ Real scout(1B)->target(8B) speculative decoding with a lossless verify/rollback
 loop, fixed draft window K=5. This is the validated, working mechanism --
 see README.md for what "validated" means here and what it doesn't cover.
 
-============================================================================
-CHANGES (2026-09-0X): ported the new_fp16_baseline.py fixes
-============================================================================
-This script previously warmed up scout and target separately with a fixed
-5-step untimed pass each, measured energy as avg_power * elapsed (biased --
-see new_fp16_baseline.py's docstring for why), used a raw untemplated prompt
-string (benchmark_ablation.py and fp16_baseline.py both use the chat
-template -- this was a real mismatch, not just an inconsistency), and
-appended telemetry rows to a CSV whose header was fixed from a much narrower
-original schema.
-
-Fixed here by pulling in bench_common.py (shared with benchmark_ablation.py,
-factored out of new_fp16_baseline.py):
-  1. Chat-template prompt encoding (bench_common.encode_prompt), matching the
-     rest of the repo.
-  2. Closed-loop thermal warmup (bench_common.warm_to_steady_state) instead
-     of a fixed number of steps: runs real speculative scout->target cycles
-     until power AND temperature stop moving, discarding the warmup output.
-     This warms both models' kernels/caches under the actual workload shape,
-     not two separate single-model warmups.
-  3. Energy from the NVML hardware energy counter (monotonic mJ counter),
-     with the old sampled-power-times-duration method kept as a recorded
-     cross-check rather than the primary number.
-  4. Per-run thermal telemetry (temp start/end/max, mean SM/mem clock,
-     throttle reasons, sample count) recorded alongside the existing fields.
-  5. bench_common.safe_append_csv guards against the exact CSV schema-
-     collision bug found and fixed in new_fp16_baseline.py on 2026-09-03: if
-     the existing telemetry_scout_accept.csv has an older/narrower column
-     set, the old file is renamed to *_legacy.csv instead of silently
-     misaligning new rows under the old header.
-  6. json.dump(..., default=bench_common.json_safe) guards against the
-     numpy.bool_/numpy.floating serialization crash also found that night.
-
-============================================================================
-PARITY FIX (found 2026-09-0X, same day as the port above)
-============================================================================
-The first port above still left this script out of parity with
-benchmark_ablation.py / new_fp16_baseline.py on the values that actually
-matter for a fair cross-script comparison: it defaulted to
-max_target_tokens=80 (vs. 250 everywhere else) and to a one-off "general
-relativity" prompt that isn't one of the three reference prompts (Poem /
-Physics / Code) the other two scripts use. Matching warmup behavior alone
-doesn't make results comparable if K, token count, or the prompt content
-differ.
-
-Fixed by pulling K, token count, and the three reference prompts from
-bench_common.REFERENCE_* (single source of truth, shared with
-benchmark_ablation.py -- see that file's CONFIG block). By default this
-script now runs all three reference prompts in one invocation, one shared
-warmup then one timed run per prompt, each recorded as its own CSV row and
-its own entry in the JSON report -- directly comparable per-category to
-fp16_baseline_nX_summary.json and ablation_results.json. --prompt-label or
---prompt still let you run a single/custom prompt for ad-hoc checks.
-
-This script runs one timed measurement per prompt (not N repeated trials),
-so there's still no drift diagnostic the way there is in
-new_fp16_baseline.py / benchmark_ablation.py -- but the warmup convergence
-trace is recorded per run, so a cold run vs. a converged run is auditable
-after the fact from the JSON output.
 """
 
 import argparse
