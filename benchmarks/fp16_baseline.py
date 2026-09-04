@@ -4,60 +4,7 @@ fp16_baseline.py
 Target-only (non-speculative) decoding baseline for speculative_scout.py and
 benchmark_ablation.py.
 
-============================================================================
-WHY THIS WAS REWRITTEN (2026-09-03)
-============================================================================
-Symptom: avg_power_watts and joules_per_token climbed run over run, regardless
-of prompt order or whether prompts were run separately.
-
-Diagnosis: it is not a measurement bug and not a prompt effect. Sorting the
-N=10 summary by timestamp instead of by category shows power rising
-~465 -> ~476 W over the first ~6 measurements (~40 s of wall clock) and then
-sitting flat at 476.7 +/- 1.0 W for the remaining two minutes. Throughput is
-constant across the whole run (38.4-38.7 tok/s), so J/tok is just a rescaled
-copy of the power trace. That is a settling transient: leakage current rising
-with die temperature at fixed clocks.
-
-Supporting evidence: the N=5 run (no throwaway warmup round) starts at
-457.18 W; the N=10 run (with the 3-prompt throwaway round) starts at 464.60 W.
-Both plateau at ~476-477 W. The 20 s warmup recovered ~7 W of a ~19 W deficit,
-i.e. ~37%, implying a time constant near 40 s. Reaching within ~1 W of steady
-state therefore needs on the order of 120 s of sustained load.
-
-So: the throwaway warmup round was the right idea, roughly 3x too short.
-
-Fixes in this version:
-  1. Closed-loop warmup. Instead of a fixed 3-prompt round, keep generating
-     until measured power AND temperature stop moving (or a hard time cap is
-     hit). The warmup trace is written into the summary so convergence is
-     auditable rather than assumed.
-  2. Energy from nvmlDeviceGetTotalEnergyConsumption (monotonic mJ counter,
-     Volta+) instead of mean(samples) * duration. The old method is biased:
-     NVML samples are not evenly spaced and the window filter discarded the
-     partial intervals at both edges. Sampled energy is still computed, by
-     proper trapezoidal integration with boundary interpolation, and both are
-     recorded so they can be cross-checked.
-  3. Per-trial thermal telemetry: temperature at window start/end, mean SM and
-     memory clock, min/max power, enforced power limit, throttle reasons,
-     sample count. The confound that took three sessions to find is now
-     visible directly in the CSV.
-  4. Optional SM/memory clock locking via NVML (needs elevated privileges;
-     falls back gracefully with an explanatory message).
-  5. Drift diagnostics in the summary: least-squares slope of power and J/tok
-     against chronological trial index, with R^2, plus an explicit warning if
-     residual drift exceeds a threshold. If the warmup was insufficient on a
-     given machine, the script says so instead of quietly reporting a mean.
-  6. KV-cache decoding (USE_KV_CACHE). The old loop re-ran the full forward
-     over the whole growing sequence every step, which is why an 8B in bf16 on
-     a ~480 W card was decoding at 38 tok/s. It also made throughput depend on
-     prompt token length -- which is exactly the cross-category difference this
-     harness is trying to measure. See the note on USE_KV_CACHE below before
-     changing it.
-
-Retained from the previous version (these were correct):
-  - tokenizer.apply_chat_template(...), matching benchmark_ablation.py.
-  - Interleaved (round-robin) trial order rather than contiguous blocks.
-  - Shared model / tokenizer / monitor across all trials.
+Use with flag: python fp16_baseline.py --no-lock-clocks
 
 ============================================================================
 PARITY WARNING
