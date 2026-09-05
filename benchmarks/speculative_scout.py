@@ -230,7 +230,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(
         description="Scout->target speculative decoding. By default runs all three "
                      "reference prompts (Poem/Physics/Code) for direct comparison "
-                     "with benchmark_ablation.py / new_fp16_baseline.py."
+                     "with benchmark_ablation.py"
     )
     ap.add_argument("--prompt-label", choices=bench_common.REFERENCE_PROMPT_LABELS,
                      help="Run only this one reference prompt instead of all three.")
