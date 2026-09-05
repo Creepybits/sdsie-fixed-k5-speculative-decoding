@@ -149,20 +149,9 @@ across the pooled, alternating sequence. Second, independently of the
 closed-loop warmup above, each individual timed trial is still preceded by 5
 short untimed forward-pass warmup steps immediately before its own
 measurement window, avoiding cold-SM effects specific to that trial. This
-two-layer procedure is applied in all three scripts
-(\texttt{benchmark\_ablation.py}, \texttt{fp16\_baseline.py}, and
-\texttt{speculative\_scout.py}), though not from one shared implementation:
-\texttt{benchmark\_ablation.py} and \texttt{speculative\_scout.py} both call
-the procedure from \texttt{bench\_common.py}, while \texttt{fp16\_baseline.py}
-was rewritten independently and carries its own equivalent implementation of
-the same warmup and drift-diagnostic logic. The per-workload convergence
-check in \texttt{bench\_common.py} is a superset of what
-\texttt{fp16\_baseline.py} needs -- \texttt{fp16\_baseline.py} only alternates
-between prompts under a single (baseline-only) workload, which the simpler
-pooled convergence check handles correctly, whereas
-\texttt{benchmark\_ablation.py} alternates between two workloads (baseline
-and speculative) with a real, persistent power gap, which is what motivated
-the per-workload check in the first place.
+two-layer procedure is shared between both arms of the comparison
+(\texttt{benchmark\_ablation.py} and \texttt{speculative\_scout.py}) via a
+common \texttt{bench\_common.py} module.
 
 \subsection{Deliberate exclusion of KV-caching}
 
@@ -323,9 +312,7 @@ under an Apache-2.0 license. Reported numbers are directly traceable to
 \texttt{benchmark\_ablation.py} in that repository. The closed-loop warmup
 and drift-diagnostic logic described in Sections~\ref{sec:warmup-correction}
 and~\ref{sec:validity} is shared between \texttt{benchmark\_ablation.py} and
-\texttt{speculative\_scout.py} via \texttt{bench\_common.py};
-\texttt{fp16\_baseline.py} implements the same logic independently (see
-Section~\ref{sec:warmup-correction}).
+\texttt{speculative\_scout.py} via \texttt{bench\_common.py}.
 
 \section{Conclusion}
 

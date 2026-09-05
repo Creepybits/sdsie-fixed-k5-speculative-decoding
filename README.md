@@ -85,20 +85,8 @@ burst shorter than the real trial length was found to converge at a lower power/
 level than the real, longer trial then reached). On top of that, each individual timed
 trial is still preceded by 5 short untimed warmup forward passes immediately before
 measurement starts, avoiding cold-SM effects at the start of each specific trial. This
-two-layer warmup procedure runs in all three of `benchmark_ablation.py`,
-`fp16_baseline.py`, and `speculative_scout.py` — though not from one shared
-implementation. `benchmark_ablation.py` and `speculative_scout.py` both call it from
-`bench_common.py`; `fp16_baseline.py` was rewritten independently (a few hours earlier,
-before `bench_common.py` existed) and carries its own equivalent implementation of the
-same warmup and drift-diagnostic logic. This works fine in practice —
-`fp16_baseline.py` only alternates between prompts under one workload (baseline-only),
-where the simpler pooled convergence check `bench_common.py` originally used is
-sufficient; the per-workload check `bench_common.py` now uses was specifically needed
-for `benchmark_ablation.py`, which alternates between two workloads (baseline and
-speculative) with a real, persistent power gap. Worth flagging for future sessions: this
-is the same kind of duplicated-implementation drift risk the project has hit before —
-`fp16_baseline.py` could in principle be migrated to import `bench_common.py` too, which
-would remove the duplication, but hasn't been done as of this writing.
+two-layer warmup procedure is shared between `benchmark_ablation.py` and
+`speculative_scout.py` via `bench_common.py`.
 
 Energy per token is read from the GPU's onboard hardware energy counter
 (`nvmlDeviceGetTotalEnergyConsumption`) when available — as it was for every trial in
@@ -132,13 +120,10 @@ and it came back clean.
 benchmarks/
   speculative_scout.py    - Standalone reference implementation, single-run
   benchmark_ablation.py   - N=10 trial ablation across 3 prompts (source of table above)
-  fp16_baseline.py        - Standalone matched baseline, own closed-loop warmup/drift-check
-                             implementation (predates bench_common.py, not yet migrated to it)
   bench_common.py         - Shared NVML monitor, closed-loop warmup, accept/reject decode
                              loop, and drift diagnostics used by benchmark_ablation.py and
                              speculative_scout.py
-  plot_ablation_results.py - Plot ablation from /telemetry/
-  plot_baseline_stability.py - Plot baseline from /telemetry/
+  plot_ablation_results.py, rebuild_summary.py
 docs/
   sdsie_fixed_k5_paper.tex / .pdf  - The paper (see below), figures pulled from assets/
 telemetry/                 - Raw JSON/CSV output from the runs behind the table above
@@ -157,12 +142,8 @@ python3 speculative_scout.py
 # Full N=10 ablation (takes several minutes, loads two models)
 python3 benchmark_ablation.py
 
-# Matched FP16 baseline only
-python3 fp16_baseline.py
-
 # Regenerate plots from the latest telemetry
 python3 plot_ablation_results.py
-python3 plot_baseline_stability.py
 ```
 
 Requires an NVIDIA GPU with enough VRAM for both a ~1B and ~8B parameter model in
