@@ -4,23 +4,19 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22210487.svg)](https://doi.org/10.5281/zenodo.22210487)
 [![Hardware](https://img.shields.io/badge/Verified%20On-NVIDIA%20RTX%205090%20Blackwell-10b981.svg)](https://sdsie.github.io/)
 [![Live Portal](https://img.shields.io/badge/Interactive%20Portal-sdsie.github.io-a855f7.svg)](https://sdsie.github.io/)  
-___
-Part of the broader [SDSIE](https://github.com/Creepybits/software-defined-stochastic-inference-engine)
-research project, which also explores entropy-gated dynamic speculation and INT4
-quantization — pieces still under active investigation, not included here. This repo
-contains only the specific mechanism (fixed-K speculative decoding) that's fully
-validated and reproducible as claimed. See [Relationship to SDSIE](https://github.com/Creepybits/sdsie-fixed-k5-speculative-decoding#relationship-to-sdsie) below for more.  
-___
 
 Real scout(1B)→target(8B) speculative decoding with a lossless verify/rollback loop,
 fixed draft window K=5. **Every number below is real, independently reproduced, and
-traceable to a script in this repo.**
-
-This is a spin-off of a specific, working piece from a larger, more experimental
-research project ([SDSIE](https://github.com/Creepybits/software-defined-stochastic-inference-engine)),
-which also explores entropy-gated *dynamic* speculation and INT4 quantization. Those
-pieces are still under active investigation and are **not** included here — this repo
-contains only the part that's fully validated and works as claimed.
+traceable to a script in this repo.** This is the fully validated, production-ready
+result from the SDSIE research line — recommended for evaluation or deployment today.
+___
+Historical note: this repo originated as an extraction from the broader
+[SDSIE](https://github.com/Creepybits/software-defined-stochastic-inference-engine)
+research project. SDSIE also explores more ambitious entropy-gated *dynamic* speculation
+and INT4 quantization-switching mechanisms; both have since been tested for real and, so
+far, found not to improve on this simpler, fixed approach — see
+[Relationship to SDSIE](#relationship-to-sdsie) below for the full, honest account.
+___
 
 ## Results (N=10 trials/prompt, RTX 5090 Blackwell, 100% output fidelity on all rows)
 
@@ -54,12 +50,14 @@ baseline (466–469 W) despite two resident models, consistent with fewer full
 
 ## What this does NOT claim
 
-- No quantization/kernel work is included here (see the parent SDSIE repo for that,
+- No quantization/kernel work is included here (see the SDSIE research repo for that,
   including a report of where it currently helps and where it doesn't).
 - No dynamic/entropy-gated draft-length adjustment — K is fixed at 5. An entropy-gated
-  version was tested and, as of the parent project's latest findings, does not yet
-  outperform this fixed-K approach in single-request testing. This repo intentionally
-  ships the simpler, proven approach rather than the more ambitious, not-yet-validated one.
+  version was tested and, as of the latest findings from that research repo, does not yet
+  outperform this fixed-K approach in single-request testing (nor does a related
+  entropy-gated *precision*-switching mechanism, tested separately). This repo
+  intentionally ships the simpler, proven approach rather than either more ambitious,
+  not-yet-validated alternative.
 - No KV-cache (deliberate, for a fair baseline-vs-speculative comparison — see
   "Methodology" below). Absolute throughput numbers here are not production-representative;
   the relative comparison (baseline vs. speculative under identical conditions) is what's
@@ -153,12 +151,17 @@ access first if you haven't already).
 
 ## Relationship to SDSIE
 
-This repo exists because the parent SDSIE project's own correction process (see its
-README) found that a claimed unified system (quantization + entropy-gated speculation)
-wasn't actually wired together end-to-end, while this specific fixed-K speculative
-decoding piece was real and independently reproducible. Rather than keep the validated
-and experimental results bundled together, this repo isolates the part that's proven,
-so it can be evaluated on its own terms without the open research questions attached.
+This repo originated as an extraction from the broader
+[SDSIE](https://github.com/Creepybits/software-defined-stochastic-inference-engine)
+research project: an early correction process there (see its README) found that a
+claimed unified system (quantization + entropy-gated speculation) wasn't actually wired
+together end-to-end, while this specific fixed-K speculative decoding piece was real and
+independently reproducible. Since then, SDSIE has gone on to test both of its more
+ambitious entropy-gated mechanisms for real — adaptive speculative draft length, and
+adaptive INT4/FP16 precision switching — and found neither yet improves on this
+simpler, fixed approach. This repo remains the validated, production-ready result from
+that research line; SDSIE remains the broader research project, reporting its ongoing
+work (including negative results) with the same evidentiary standard.
 
 ## License
 
