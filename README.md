@@ -39,14 +39,41 @@ content (code), lower but still real on less predictable content (free-form pros
 
 ![Speedup vs. FP16 baseline as a function of draft accept rate](assets/speedup_vs_accept_rate.png)
 
-Accept rates were independently cross-validated across every run of this ablation to
-date — including today's, after a full rewrite of the measurement harness — and match
-to within a few hundredths of a percentage point every time (deterministic greedy
-decoding), which is strong evidence the accept/reject logic itself has been correct and
-stable throughout, independent of the measurement-methodology fixes described below.
+Accept rates have been independently cross-validated across every run of this ablation,
+including across a full rewrite of the measurement harness, and consistently match to
+within a few hundredths of a percentage point (deterministic greedy decoding) — strong
+evidence the accept/reject logic itself is correct and stable, independent of the
+measurement-methodology fixes described below.
 Mean GPU power during speculative runs (344–363 W) is lower than during the FP16
 baseline (466–469 W) despite two resident models, consistent with fewer full
 8B-parameter forward passes required per unit of output as accepted draft batches grow.
+
+### Why these prompts
+
+The three prompts span a range of *token-level predictability* for the model, not
+difficulty for a person — and that distinction matters, because the results above can
+look backwards at first glance. Code is often considered a more cognitively demanding
+task than free-form poetry, yet it gets the largest speedup (85.4% accept rate) while
+poetry gets the smallest (42.5%).
+
+The resolution: speculative decoding's accept rate depends on how sharply peaked the
+model's next-token probability distribution is, which is a different axis from how hard
+a task is for a person. Code has strict, learned syntactic structure — matching
+brackets, indentation rules, a constrained vocabulary of keywords and common idioms — so
+at most token positions there is essentially one syntactically valid continuation, or a
+very small set of them. The scout's greedy guess is usually right, and draft windows
+survive largely intact regardless of how logically demanding the underlying code is to
+write. Open-ended creative writing has close to the opposite property at the token
+level: at nearly every position there are many equally plausible word choices (synonyms,
+alternate phrasings, meter- and rhyme-driven word selection for the Chant Royal form
+used here), so the model's distribution is flatter and the scout is wrong more often —
+again, independent of how hard the poem actually is to compose. Physics explanation
+falls in between: more lexical variety than code, but far less than open verse, and its
+51.7% accept rate lands squarely between the other two.
+
+This is precisely the axis speculative decoding's speedup is sensitive to (see the
+accept-rate figure above), which is why the prompts were chosen to span it deliberately
+— not to span perceived task difficulty.
 
 ## What this does NOT claim
 
