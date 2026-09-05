@@ -20,16 +20,17 @@ ___
 
 ## Results (N=10 trials/prompt, RTX 5090 Blackwell, 100% output fidelity on all rows)
 
-*Updated 2026-09-04. Supersedes the numbers previously reported here — a warmup-timing
-bug was found and fixed (see [Methodology](#methodology) below); the relative story is
-unchanged, but every figure below is a fresh, re-measured number, not a revision of the
-old ones by formula.*
+*Updated 2026-09-05. Supersedes the numbers previously reported here — a further warmup
+convergence fix (see [Methodology](#methodology) below) let the closed-loop warmup reach
+genuine steady state for the first time (previous runs hit their time cap without
+converging); every figure below is a fresh, re-measured number from a run with the
+cleanest drift diagnostics of the project to date.*
 
 | Prompt | Baseline tok/s | Speculative tok/s | Speedup | Baseline J/tok | Speculative J/tok | Energy Δ | Accept % |
 |---|---|---|---|---|---|---|---|
-| Poem | 38.42 ± 0.18 | 40.98 ± 0.35 | +6.7% | 11.66 ± 0.11 | 7.91 ± 0.10 | −32.2% | 42.5% |
-| Physics | 38.45 ± 0.50 | 47.03 ± 0.42 | +22.3% | 11.64 ± 0.11 | 7.18 ± 0.12 | −38.3% | 51.7% |
-| Code | 38.90 ± 0.67 | **69.44 ± 0.73** | **+78.5%** | 11.66 ± 0.12 | **4.74 ± 0.09** | **−59.3%** | **85.4%** |
+| Poem | 40.16 ± 0.28 | 43.55 ± 0.31 | +8.4% | 11.44 ± 0.09 | 7.70 ± 0.06 | −32.7% | 42.5% |
+| Physics | 40.05 ± 0.18 | 49.64 ± 0.43 | +24.0% | 11.49 ± 0.06 | 6.99 ± 0.06 | −39.2% | 51.7% |
+| Code | 40.04 ± 0.23 | **73.46 ± 0.74** | **+83.5%** | 11.54 ± 0.05 | **4.53 ± 0.04** | **−60.8%** | **85.4%** |
 
 ![Throughput: FP16 baseline vs. speculative (K=5), per prompt](assets/throughput_baseline_vs_speculative.png)
 ![Energy per token: FP16 baseline vs. speculative (K=5), per prompt](assets/energy_per_token_baseline_vs_speculative.png)
@@ -43,12 +44,16 @@ Accept rates have been independently cross-validated across every run of this ab
 including across a full rewrite of the measurement harness, and consistently match to
 within a few hundredths of a percentage point (deterministic greedy decoding) — strong
 evidence the accept/reject logic itself is correct and stable, independent of the
-measurement-methodology fixes described below.
-Mean GPU power during speculative runs (344–363 W) is lower than during the FP16
-baseline (466–469 W) despite two resident models, consistent with fewer full
+measurement-methodology fixes described below. This run's accept rates (42.5% / 51.7% /
+85.4%) also match `speculative_scout.py`'s independent single-run figures exactly, and
+its throughput/energy numbers land within a few percent of that script's own
+independently-measured values — two different scripts, same underlying `bench_common.py`,
+agreeing with each other rather than just being internally consistent with themselves.
+Mean GPU power during speculative runs (346–364 W) is lower than during the FP16
+baseline (463–466 W) despite two resident models, consistent with fewer full
 8B-parameter forward passes required per unit of output as accepted draft batches grow.
 
-## Why these prompts
+### Why these prompts
 
 The three prompts span a range of *token-level predictability* for the model, not
 difficulty for a person — and that distinction matters, because the results above can
@@ -100,18 +105,28 @@ of both being slower in absolute terms than a production server with caching wou
 
 Warmup happens in two layers. Before any timed trial, a **closed-loop thermal warmup**
 runs real (discarded) baseline and speculative decoding cycles, alternating across all
-three prompts and both conditions, until GPU temperature stops moving and *each*
-prompt/condition combination's own power reading individually stops moving — not until
-consecutive readings across different combinations happen to agree with each other,
-since baseline and speculative draw genuinely different power by design. This replaced
-an earlier fixed-length warmup that recovered only part of the GPU's cold-start power
-deficit (see `bench_common.py`'s `warm_to_steady_state` for the full history: a warmup
-burst shorter than the real trial length was found to converge at a lower power/temp
-level than the real, longer trial then reached). On top of that, each individual timed
-trial is still preceded by 5 short untimed warmup forward passes immediately before
-measurement starts, avoiding cold-SM effects at the start of each specific trial. This
-two-layer warmup procedure is shared between `benchmark_ablation.py` and
-`speculative_scout.py` via `bench_common.py`.
+three prompts and both conditions, until *each* prompt/condition combination's own power
+AND temperature readings individually stop drifting — not until consecutive readings
+across different combinations happen to agree with each other, since baseline and
+speculative draw genuinely different power (and settle at different temperatures) by
+design. This is now a two-stage fix on top of the original design (see
+`bench_common.py`'s `warm_to_steady_state` docstring for the full history): first, a
+warmup burst shorter than the real trial length was found to converge at a lower
+power/temp level than the real, longer trial then reached, so burst length was matched to
+trial length; second, and found later, a fixed absolute power tolerance (1.5 W) turned
+out to be tighter than the hardware's own sample-to-sample noise floor on this machine
+(measured sd: 2.9 W baseline, 6.8 W speculative), so it could never be satisfied
+regardless of run length, and temperature was pooled across labels on the assumption that
+die temperature is workload-independent — true only when the workload is homogeneous,
+false here, since baseline and speculative settle roughly 3-4°C apart. Both fixed: power
+tolerance is now relative to each label's own mean draw (1.5%), temperature is tracked
+per label like power, and both use a half-split drift statistic (newer-half mean vs.
+older-half mean of a rolling window) rather than raw min-max spread, which does not grow
+spuriously with window length under pure noise the way spread does. On top of the
+closed-loop warmup, each individual timed trial is still preceded by 5 short untimed
+warmup forward passes immediately before measurement starts, avoiding cold-SM effects at
+the start of each specific trial. This two-layer warmup procedure is shared between
+`benchmark_ablation.py` and `speculative_scout.py` via `bench_common.py`.
 
 Energy per token is read from the GPU's onboard hardware energy counter
 (`nvmlDeviceGetTotalEnergyConsumption`) when available — as it was for every trial in
@@ -125,19 +140,15 @@ between baseline and speculative output.
 
 Each reported run's per-trial telemetry is checked for residual warmup drift: a
 least-squares fit of power, energy/token, and throughput against chronological trial
-index. For the run behind the table above, the fitted trend was negligible in every
-case (R² ≈ 0 for all three metrics, pooled and per-condition — the largest was 0.09),
-and the total drift over the full 60-trial run was small in absolute terms (about −2 W
-over the whole run, against a pooled mean near 410 W). The script's own pass/fail
-threshold (±0.5% of mean) is a blunt cutoff that doesn't look at R², so it did flag this
-run (pooled: −0.53%; speculative-only: −0.58%; baseline-only passed at −0.48%) — worth
-knowing about, but a near-zero R² alongside a sub-1%-of-mean total change is consistent
-with ordinary run-to-run noise, not a systematic warmup or thermal trend contaminating
-the reported means. Separately, on this specific run the closed-loop warmup itself did
-not fully converge within its 420 s cap (WSL2 GPU passthrough appears to add enough power
-reporting noise that the strict per-label 1.5 W tolerance wasn't reliably satisfied in
-time) — the drift check above is exactly the safeguard that exists for this situation,
-and it came back clean.
+index. The run behind the table above is the first on this project to have both a fully
+**converged** closed-loop warmup (241.3 s, well under the 420 s cap — every prior run
+hit the cap without converging) and the cleanest drift diagnostics to date: R² for every
+metric, pooled and per-condition, is effectively zero (0.00004 to 0.037), and the
+script's own pass/fail threshold (±0.5% of mean power) passed cleanly this time (pooled
+0.30%, baseline-only 0.38%, speculative-only 0.19%) — not just "passed despite the flag
+firing," as in earlier runs, but genuinely within tolerance on every check. This is the
+strongest evidence yet that the reported means reflect real steady-state behavior rather
+than a residual thermal trend.
 
 ## Repository structure
 

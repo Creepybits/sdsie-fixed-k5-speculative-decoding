@@ -51,9 +51,23 @@ import torch
 # ============================================================================
 MIN_WARMUP_SEC = 120.0
 MAX_WARMUP_SEC = 420.0
-WARMUP_WINDOW = 4
-WARMUP_POWER_TOL_W = 1.5
+
+# Window length per label. Convergence compares the mean of the newer half
+# against the mean of the older half, so this must be even and >= 4.
+WARMUP_WINDOW = 6
+
+# Power tolerance is RELATIVE to each label's own mean, not absolute. The two
+# workloads here sit ~105 W apart (baseline ~465 W, speculative ~360 W) and
+# their sample noise scales with draw, so one absolute watt figure cannot fit
+# both. 1.5% ~= 7.0 W at baseline, 5.4 W at speculative.
+WARMUP_POWER_TOL_FRACTION = 0.015
 WARMUP_TEMP_TOL_C = 1.0
+
+# Retained so existing callers/imports don't break. No longer used by
+# warm_to_steady_state: an absolute max-min spread tolerance this tight is
+# below the hardware's own sample-to-sample noise floor (measured pooled sd:
+# 2.9 W baseline, 6.8 W speculative), so it could never be satisfied.
+WARMUP_POWER_TOL_W = 1.5
 
 DRIFT_WARN_FRACTION = 0.005  # 0.5%
 
@@ -332,8 +346,24 @@ def encode_prompt(tokenizer, prompt, device="cuda"):
 # Closed-loop thermal warmup (generic over workload)
 # ============================================================================
 
+def _half_split_drift(history):
+    """|mean(newer half) - mean(older half)| for an even-length window.
+
+    Used instead of max(h) - min(h). Max-min is an extreme-value statistic:
+    its expected value grows with window length even when the signal is
+    perfectly stationary, so it measures noise amplitude, not drift. The
+    half-split difference averages noise down while staying fully sensitive
+    to a monotonic trend, which is the thing warmup actually cares about.
+    """
+    n = len(history)
+    k = n // 2
+    older = list(history)[:k]
+    newer = list(history)[k:]
+    return abs((sum(newer) / len(newer)) - (sum(older) / len(older)))
+
+
 def warm_to_steady_state(monitor, step_fn, min_sec=MIN_WARMUP_SEC, max_sec=MAX_WARMUP_SEC,
-                          window=WARMUP_WINDOW, power_tol=WARMUP_POWER_TOL_W,
+                          window=WARMUP_WINDOW, power_tol_fraction=WARMUP_POWER_TOL_FRACTION,
                           temp_tol=WARMUP_TEMP_TOL_C):
     """Run step_fn() repeatedly (discarded, not recorded) until power AND
     temperature stop moving, or max_sec is hit.
@@ -349,33 +379,53 @@ def warm_to_steady_state(monitor, step_fn, min_sec=MIN_WARMUP_SEC, max_sec=MAX_W
     scout+target cycles, etc.) since the thermal transient is a GPU-wide
     property of sustained load, not specific to any one kernel mix.
 
-    Convergence check design (fixed 2026-09-0X): temperature is tracked as a
-    single rolling window across ALL iterations, since it's a slow,
-    workload-independent signal -- the physical driver of the settling
-    transient is die temperature, not which specific kernel mix is running.
-    Power is tracked per DISTINCT LABEL instead, in separate rolling windows
-    keyed by whatever string step_fn returns. This matters when step_fn
-    alternates between workloads with genuinely different steady-state power
-    draw by design -- e.g. benchmark_ablation.py's warmup alternates baseline
-    and speculative decode, which differ in power by tens of watts as a real
-    effect, not noise. The original design checked whether N *consecutive*
-    readings (regardless of label) agreed with each other; with two
-    interleaved workloads that differ by design, consecutive readings almost
-    never agree, so that check could run indefinitely without ever
-    converging. Checking whether each label's own readings have stopped
-    moving, relative to its own recent history, is correct for both the
-    homogeneous case (fp16_baseline / speculative_scout, one workload type,
-    only the prompt varies) and the heterogeneous case (benchmark_ablation,
-    two workload types by design).
+    Convergence check design (revised): BOTH power and temperature are
+    tracked per DISTINCT LABEL, in separate rolling windows keyed by whatever
+    string step_fn returns, and each is tested for DRIFT (newer-half mean vs
+    older-half mean) rather than for raw spread.
+
+    History, because two earlier versions of this were wrong in the same way:
+
+    v1 checked whether N *consecutive* readings agreed, regardless of label.
+    With two interleaved workloads that differ by design, consecutive
+    readings almost never agree, so it could never converge.
+
+    v2 fixed that for power by keying power windows per label, but left
+    temperature pooled across all labels, on the reasoning that die
+    temperature is a slow, workload-independent signal. That reasoning is
+    wrong on this hardware. Baseline decode draws ~465 W and speculative
+    ~360 W, so each burst type settles at its own end-of-burst temperature
+    (~63 C vs ~59 C measured). Pooling them produces a permanent 3-5 C
+    sawtooth in the rolling window, which is always outside a 1.0 C
+    tolerance no matter how long the loop runs. Temperature is only
+    workload-independent if the workload is homogeneous; here it isn't.
+
+    v2 also compared max(window) - min(window) against an absolute watt
+    tolerance. Max-min grows with window length under pure noise, and the
+    measured noise floor on settled hardware (sd 2.9 W baseline, 6.8 W
+    speculative) puts a 4-sample spread around 7-11 W -- far outside the
+    1.5 W tolerance. So the power test was also unsatisfiable, independently
+    of the temperature bug. Both are fixed here: drift test instead of
+    spread, and a tolerance relative to each label's own mean draw.
+
+    Note that the per-label windows mean at least (window * number of
+    distinct labels) iterations must elapse before convergence can be
+    signalled at all. benchmark_ablation.py emits 6 labels (3 prompts x 2
+    conditions), so with window=6 that floor is 36 iterations. Keep max_sec
+    comfortably above that.
     """
+    if window < 4 or window % 2:
+        raise ValueError(f"window must be even and >= 4, got {window}")
+
     print("\n" + "#" * 95)
     print("# CLOSED-LOOP THERMAL WARMUP (discarded, not recorded)")
-    print(f"# target: temp stable within {temp_tol} C over last {window} iterations (any label);")
-    print(f"# each distinct label's own power stable within {power_tol} W over its last {window} readings")
+    print(f"# per label, over its own last {window} readings, newer-half mean vs older-half mean:")
+    print(f"#   power drift <= {power_tol_fraction * 100:.2f}% of that label's mean draw")
+    print(f"#   temp  drift <= {temp_tol} C")
     print(f"# floor: {min_sec:.0f} s   cap: {max_sec:.0f} s")
     print("#" * 95)
 
-    temp_history = deque(maxlen=window)
+    temp_history_by_label = {}
     power_history_by_label = {}
     trace = []
     t_origin = time.perf_counter()
@@ -405,35 +455,84 @@ def warm_to_steady_state(monitor, step_fn, min_sec=MIN_WARMUP_SEC, max_sec=MAX_W
         print(f"  warmup {i + 1:>3}  {str(label):<12}  t={elapsed:6.1f}s  {pw_str}{tc_str}")
 
         if tc is not None:
-            temp_history.append(tc)
+            temp_history_by_label.setdefault(label, deque(maxlen=window)).append(tc)
         if pw is not None:
             power_history_by_label.setdefault(label, deque(maxlen=window)).append(pw)
         i += 1
 
         if elapsed >= min_sec:
-            temp_ok = (len(temp_history) == window
-                       and (max(temp_history) - min(temp_history)) <= temp_tol)
-            label_spreads = {
-                lbl: (max(h) - min(h)) for lbl, h in power_history_by_label.items() if len(h) == window
-            }
-            power_ok = bool(power_history_by_label) and len(label_spreads) == len(power_history_by_label) \
-                and all(spread <= power_tol for spread in label_spreads.values())
+            # Every label must have a full window of its own, and every label
+            # must individually have stopped moving. A label that has not yet
+            # accumulated `window` readings blocks convergence rather than
+            # being silently skipped.
+            power_drifts, temp_drifts = {}, {}
+            power_ok = bool(power_history_by_label)
+            temp_ok = bool(temp_history_by_label)
+
+            for lbl, h in power_history_by_label.items():
+                if len(h) < window:
+                    power_ok = False
+                    continue
+                d = _half_split_drift(h)
+                power_drifts[lbl] = d
+                if d > power_tol_fraction * (sum(h) / len(h)):
+                    power_ok = False
+
+            for lbl, h in temp_history_by_label.items():
+                if len(h) < window:
+                    temp_ok = False
+                    continue
+                d = _half_split_drift(h)
+                temp_drifts[lbl] = d
+                if d > temp_tol:
+                    temp_ok = False
 
             if temp_ok and power_ok:
-                temp_spread = max(temp_history) - min(temp_history)
-                spreads_str = ", ".join(f"{lbl}={spread:.2f}W" for lbl, spread in label_spreads.items())
+                pstr = ", ".join(f"{lbl}={d:.2f}W" for lbl, d in power_drifts.items())
+                tstr = ", ".join(f"{lbl}={d:.2f}C" for lbl, d in temp_drifts.items())
                 print(f"[*] Steady state reached after {elapsed:.1f} s "
-                      f"({i} warmup iterations). Temp spread {temp_spread} C. "
-                      f"Per-label power spreads: {spreads_str}")
+                      f"({i} warmup iterations).")
+                print(f"    Per-label power drift: {pstr}")
+                print(f"    Per-label temp  drift: {tstr}")
                 return {"converged": True, "elapsed_sec": round(elapsed, 2),
-                        "iterations": i, "trace": trace}
+                        "iterations": i, "trace": trace,
+                        "final_power_drift_w_by_label": {k: round(v, 3) for k, v in power_drifts.items()},
+                        "final_temp_drift_c_by_label": {k: round(v, 3) for k, v in temp_drifts.items()},
+                        "criteria": {"window": window,
+                                     "power_tol_fraction": power_tol_fraction,
+                                     "temp_tol_c": temp_tol}}
 
         if elapsed >= max_sec:
             print(f"[!] Warmup cap of {max_sec:.0f} s hit without convergence.")
+            n_labels = max(len(power_history_by_label), 1)
+            short = [lbl for lbl, h in power_history_by_label.items() if len(h) < window]
+            if short:
+                # Distinguish "still drifting" from "never had enough samples".
+                print(f"    NOTE: {len(short)} of {n_labels} labels never filled their "
+                      f"{window}-reading window: {', '.join(short)}")
+                print(f"    step_fn emits {n_labels} distinct labels, so convergence needs at "
+                      f"least {window * n_labels} iterations. Raise --max-warmup, or have "
+                      f"step_fn return fewer distinct labels.")
+            else:
+                worst_p = max(((_half_split_drift(h) / (sum(h) / len(h)), lbl)
+                               for lbl, h in power_history_by_label.items() if len(h) == window),
+                              default=(0.0, None))
+                worst_t = max(((_half_split_drift(h), lbl)
+                               for lbl, h in temp_history_by_label.items() if len(h) == window),
+                              default=(0.0, None))
+                print(f"    Worst residual power drift: {worst_p[1]} at {worst_p[0] * 100:.2f}% "
+                      f"(tol {power_tol_fraction * 100:.2f}%)")
+                print(f"    Worst residual temp  drift: {worst_t[1]} at {worst_t[0]:.2f} C "
+                      f"(tol {temp_tol} C)")
             print("    Trials will still run, but check drift_diagnostics in the")
             print("    summary before trusting the means.")
             return {"converged": False, "elapsed_sec": round(elapsed, 2),
-                    "iterations": i, "trace": trace}
+                    "iterations": i, "trace": trace,
+                    "labels_short_of_window": short,
+                    "n_distinct_labels": len(power_history_by_label),
+                    "criteria": {"window": window,
+                                 "power_tol_fraction": power_tol_fraction,
+                                 "temp_tol_c": temp_tol}}
 
 
 # ============================================================================

@@ -7,58 +7,58 @@
   "ablation": {
     "prompt_1": {
       "FP16 Baseline": {
-        "tps_mean": 38.417,
-        "tps_std": 0.18482694608741454,
-        "j_tok_mean": 11.659664,
-        "j_tok_std": 0.10785495979323317,
-        "power_mean": 468.73100000000005
+        "tps_mean": 40.164,
+        "tps_std": 0.2845417368331051,
+        "j_tok_mean": 11.4410256,
+        "j_tok_std": 0.09321864085170947,
+        "power_mean": 465.80699999999996
       },
       "Speculative (1B->8B)": {
-        "tps_mean": 40.983000000000004,
-        "tps_std": 0.34620947416268094,
-        "j_tok_mean": 7.905633999999999,
-        "j_tok_std": 0.10066465736493604,
-        "power_mean": 344.11400000000003,
+        "tps_mean": 43.553,
+        "tps_std": 0.307670278057533,
+        "j_tok_mean": 7.6989712,
+        "j_tok_std": 0.05776609183387774,
+        "power_mean": 345.527,
         "accept_rate_pct_mean": 42.470000000000006
       }
     },
     "prompt_2": {
       "FP16 Baseline": {
-        "tps_mean": 38.451,
-        "tps_std": 0.501745951652826,
-        "j_tok_mean": 11.644486400000002,
-        "j_tok_std": 0.1058113792020496,
-        "power_mean": 465.75199999999995
+        "tps_mean": 40.04600000000001,
+        "tps_std": 0.183313938368034,
+        "j_tok_mean": 11.4876204,
+        "j_tok_std": 0.059903727468664195,
+        "power_mean": 463.465
       },
       "Speculative (1B->8B)": {
-        "tps_mean": 47.032,
-        "tps_std": 0.4170323728441232,
-        "j_tok_mean": 7.1834147999999995,
-        "j_tok_std": 0.11596850521482115,
-        "power_mean": 362.608,
+        "tps_mean": 49.644,
+        "tps_std": 0.4348149031484542,
+        "j_tok_mean": 6.988809999999999,
+        "j_tok_std": 0.05602313294345492,
+        "power_mean": 364.029,
         "accept_rate_pct_mean": 51.71
       }
     },
     "prompt_3": {
       "FP16 Baseline": {
-        "tps_mean": 38.897,
-        "tps_std": 0.6715511894114998,
-        "j_tok_mean": 11.659348,
-        "j_tok_std": 0.11691652250730013,
-        "power_mean": 466.69000000000005
+        "tps_mean": 40.042,
+        "tps_std": 0.22815784010197898,
+        "j_tok_mean": 11.5444432,
+        "j_tok_std": 0.05077150003062733,
+        "power_mean": 462.63199999999995
       },
       "Speculative (1B->8B)": {
-        "tps_mean": 69.43799999999999,
-        "tps_std": 0.7251317121737274,
-        "j_tok_mean": 4.739640799999999,
-        "j_tok_std": 0.09182860753033333,
-        "power_mean": 354.32500000000005,
+        "tps_mean": 73.46300000000001,
+        "tps_std": 0.7440974398558309,
+        "j_tok_mean": 4.530384400000001,
+        "j_tok_std": 0.035720917903099926,
+        "power_mean": 355.81100000000004,
         "accept_rate_pct_mean": 85.41999999999999
       }
     }
   },
   "_meta": {
-    "timestamp": "2026-09-04T12:08:48.058561",
+    "timestamp": "2026-09-05T23:36:18.309676",
     "device": {
       "device_index": 0,
       "energy_counter_supported": true,
@@ -79,656 +79,445 @@
       "trial_order": "interleaved: category round-robin, condition alternated each round"
     },
     "warmup": {
-      "converged": false,
-      "elapsed_sec": 422.8,
-      "iterations": 73,
+      "converged": true,
+      "elapsed_sec": 241.28,
+      "iterations": 44,
       "trace": [
         {
           "iteration": 1,
           "label": "Poem/base",
-          "elapsed_sec": 7.1,
-          "mean_power_w": 370.92,
-          "temp_c": 53,
-          "sm_clock_mean_mhz": 2735.7
+          "elapsed_sec": 7.31,
+          "mean_power_w": 351.62,
+          "temp_c": 51,
+          "sm_clock_mean_mhz": 2493.0
         },
         {
           "iteration": 2,
           "label": "Physics/spec",
-          "elapsed_sec": 12.55,
-          "mean_power_w": 351.53,
-          "temp_c": 53,
-          "sm_clock_mean_mhz": 2852.1
+          "elapsed_sec": 12.34,
+          "mean_power_w": 353.3,
+          "temp_c": 50,
+          "sm_clock_mean_mhz": 2850.4
         },
         {
           "iteration": 3,
           "label": "Code/base",
-          "elapsed_sec": 19.08,
-          "mean_power_w": 455.96,
-          "temp_c": 56,
-          "sm_clock_mean_mhz": 2845.1
+          "elapsed_sec": 18.52,
+          "mean_power_w": 452.34,
+          "temp_c": 54,
+          "sm_clock_mean_mhz": 2848.4
         },
         {
           "iteration": 4,
           "label": "Poem/spec",
-          "elapsed_sec": 25.14,
-          "mean_power_w": 346.89,
-          "temp_c": 54,
+          "elapsed_sec": 24.18,
+          "mean_power_w": 345.76,
+          "temp_c": 53,
           "sm_clock_mean_mhz": 2848.5
         },
         {
           "iteration": 5,
           "label": "Physics/base",
-          "elapsed_sec": 31.69,
-          "mean_power_w": 459.73,
-          "temp_c": 58,
-          "sm_clock_mean_mhz": 2843.5
+          "elapsed_sec": 30.37,
+          "mean_power_w": 455.54,
+          "temp_c": 56,
+          "sm_clock_mean_mhz": 2845.0
         },
         {
           "iteration": 6,
           "label": "Code/spec",
-          "elapsed_sec": 35.3,
-          "mean_power_w": 358.28,
-          "temp_c": 57,
-          "sm_clock_mean_mhz": 2847.6
+          "elapsed_sec": 33.76,
+          "mean_power_w": 354.07,
+          "temp_c": 53,
+          "sm_clock_mean_mhz": 2850.9
         },
         {
           "iteration": 7,
           "label": "Poem/base",
-          "elapsed_sec": 41.8,
-          "mean_power_w": 460.36,
-          "temp_c": 60,
-          "sm_clock_mean_mhz": 2841.2
+          "elapsed_sec": 39.94,
+          "mean_power_w": 455.38,
+          "temp_c": 58,
+          "sm_clock_mean_mhz": 2840.0
         },
         {
           "iteration": 8,
           "label": "Physics/spec",
-          "elapsed_sec": 47.23,
-          "mean_power_w": 361.91,
-          "temp_c": 57,
-          "sm_clock_mean_mhz": 2843.8
+          "elapsed_sec": 44.91,
+          "mean_power_w": 364.62,
+          "temp_c": 55,
+          "sm_clock_mean_mhz": 2845.1
         },
         {
           "iteration": 9,
           "label": "Code/base",
-          "elapsed_sec": 53.81,
-          "mean_power_w": 460.77,
-          "temp_c": 61,
-          "sm_clock_mean_mhz": 2840.7
+          "elapsed_sec": 51.11,
+          "mean_power_w": 461.93,
+          "temp_c": 60,
+          "sm_clock_mean_mhz": 2840.5
         },
         {
           "iteration": 10,
           "label": "Poem/spec",
-          "elapsed_sec": 59.86,
-          "mean_power_w": 353.54,
-          "temp_c": 59,
-          "sm_clock_mean_mhz": 2844.2
+          "elapsed_sec": 56.77,
+          "mean_power_w": 354.46,
+          "temp_c": 58,
+          "sm_clock_mean_mhz": 2843.6
         },
         {
           "iteration": 11,
           "label": "Physics/base",
-          "elapsed_sec": 66.32,
-          "mean_power_w": 463.1,
-          "temp_c": 62,
-          "sm_clock_mean_mhz": 2838.5
+          "elapsed_sec": 62.95,
+          "mean_power_w": 465.64,
+          "temp_c": 60,
+          "sm_clock_mean_mhz": 2840.0
         },
         {
           "iteration": 12,
           "label": "Code/spec",
-          "elapsed_sec": 69.91,
-          "mean_power_w": 355.24,
-          "temp_c": 61,
-          "sm_clock_mean_mhz": 2841.1
+          "elapsed_sec": 66.33,
+          "mean_power_w": 363.96,
+          "temp_c": 58,
+          "sm_clock_mean_mhz": 2842.5
         },
         {
           "iteration": 13,
           "label": "Poem/base",
-          "elapsed_sec": 76.48,
-          "mean_power_w": 459.41,
+          "elapsed_sec": 72.5,
+          "mean_power_w": 465.03,
           "temp_c": 62,
-          "sm_clock_mean_mhz": 2837.3
+          "sm_clock_mean_mhz": 2840.5
         },
         {
           "iteration": 14,
           "label": "Physics/spec",
-          "elapsed_sec": 81.95,
-          "mean_power_w": 363.49,
+          "elapsed_sec": 77.48,
+          "mean_power_w": 371.79,
           "temp_c": 59,
-          "sm_clock_mean_mhz": 2842.2
+          "sm_clock_mean_mhz": 2842.9
         },
         {
           "iteration": 15,
           "label": "Code/base",
-          "elapsed_sec": 88.54,
-          "mean_power_w": 461.91,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2838.7
+          "elapsed_sec": 83.67,
+          "mean_power_w": 468.21,
+          "temp_c": 62,
+          "sm_clock_mean_mhz": 2841.2
         },
         {
           "iteration": 16,
           "label": "Poem/spec",
-          "elapsed_sec": 94.56,
-          "mean_power_w": 353.79,
-          "temp_c": 60,
+          "elapsed_sec": 89.4,
+          "mean_power_w": 354.24,
+          "temp_c": 59,
           "sm_clock_mean_mhz": 2842.3
         },
         {
           "iteration": 17,
           "label": "Physics/base",
-          "elapsed_sec": 101.14,
-          "mean_power_w": 466.79,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2839.0
+          "elapsed_sec": 95.6,
+          "mean_power_w": 468.37,
+          "temp_c": 62,
+          "sm_clock_mean_mhz": 2841.0
         },
         {
           "iteration": 18,
           "label": "Code/spec",
-          "elapsed_sec": 104.7,
-          "mean_power_w": 364.08,
-          "temp_c": 58,
-          "sm_clock_mean_mhz": 2842.3
+          "elapsed_sec": 98.98,
+          "mean_power_w": 366.14,
+          "temp_c": 60,
+          "sm_clock_mean_mhz": 2843.3
         },
         {
           "iteration": 19,
           "label": "Poem/base",
-          "elapsed_sec": 111.35,
-          "mean_power_w": 458.89,
-          "temp_c": 61,
-          "sm_clock_mean_mhz": 2838.2
-        },
-        {
-          "iteration": 20,
-          "label": "Physics/spec",
-          "elapsed_sec": 116.73,
-          "mean_power_w": 364.63,
-          "temp_c": 61,
-          "sm_clock_mean_mhz": 2841.9
-        },
-        {
-          "iteration": 21,
-          "label": "Code/base",
-          "elapsed_sec": 123.26,
-          "mean_power_w": 466.08,
+          "elapsed_sec": 105.17,
+          "mean_power_w": 465.96,
           "temp_c": 62,
           "sm_clock_mean_mhz": 2838.4
         },
         {
+          "iteration": 20,
+          "label": "Physics/spec",
+          "elapsed_sec": 110.15,
+          "mean_power_w": 371.41,
+          "temp_c": 60,
+          "sm_clock_mean_mhz": 2841.6
+        },
+        {
+          "iteration": 21,
+          "label": "Code/base",
+          "elapsed_sec": 116.33,
+          "mean_power_w": 468.13,
+          "temp_c": 62,
+          "sm_clock_mean_mhz": 2838.0
+        },
+        {
           "iteration": 22,
           "label": "Poem/spec",
-          "elapsed_sec": 129.25,
-          "mean_power_w": 354.85,
-          "temp_c": 60,
+          "elapsed_sec": 121.99,
+          "mean_power_w": 358.03,
+          "temp_c": 59,
           "sm_clock_mean_mhz": 2841.5
         },
         {
           "iteration": 23,
           "label": "Physics/base",
-          "elapsed_sec": 135.82,
-          "mean_power_w": 467.43,
+          "elapsed_sec": 128.21,
+          "mean_power_w": 468.83,
           "temp_c": 63,
-          "sm_clock_mean_mhz": 2837.8
+          "sm_clock_mean_mhz": 2838.1
         },
         {
           "iteration": 24,
           "label": "Code/spec",
-          "elapsed_sec": 139.38,
-          "mean_power_w": 360.92,
-          "temp_c": 59,
-          "sm_clock_mean_mhz": 2843.6
+          "elapsed_sec": 131.59,
+          "mean_power_w": 365.56,
+          "temp_c": 61,
+          "sm_clock_mean_mhz": 2839.6
         },
         {
           "iteration": 25,
           "label": "Poem/base",
-          "elapsed_sec": 145.92,
-          "mean_power_w": 466.02,
+          "elapsed_sec": 137.77,
+          "mean_power_w": 466.21,
           "temp_c": 63,
-          "sm_clock_mean_mhz": 2839.4
+          "sm_clock_mean_mhz": 2838.4
         },
         {
           "iteration": 26,
           "label": "Physics/spec",
-          "elapsed_sec": 151.16,
-          "mean_power_w": 368.15,
+          "elapsed_sec": 142.91,
+          "mean_power_w": 363.98,
           "temp_c": 61,
-          "sm_clock_mean_mhz": 2841.3
+          "sm_clock_mean_mhz": 2843.1
         },
         {
           "iteration": 27,
           "label": "Code/base",
-          "elapsed_sec": 157.66,
-          "mean_power_w": 468.57,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2837.6
+          "elapsed_sec": 149.21,
+          "mean_power_w": 461.61,
+          "temp_c": 62,
+          "sm_clock_mean_mhz": 2838.4
         },
         {
           "iteration": 28,
           "label": "Poem/spec",
-          "elapsed_sec": 163.77,
-          "mean_power_w": 353.97,
+          "elapsed_sec": 154.93,
+          "mean_power_w": 354.42,
           "temp_c": 59,
           "sm_clock_mean_mhz": 2841.3
         },
         {
           "iteration": 29,
           "label": "Physics/base",
-          "elapsed_sec": 170.18,
-          "mean_power_w": 469.73,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2838.6
+          "elapsed_sec": 161.14,
+          "mean_power_w": 466.46,
+          "temp_c": 62,
+          "sm_clock_mean_mhz": 2837.7
         },
         {
           "iteration": 30,
           "label": "Code/spec",
-          "elapsed_sec": 173.8,
-          "mean_power_w": 363.16,
-          "temp_c": 61,
-          "sm_clock_mean_mhz": 2841.7
-        },
-        {
-          "iteration": 31,
-          "label": "Poem/base",
-          "elapsed_sec": 180.35,
-          "mean_power_w": 466.11,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2839.7
-        },
-        {
-          "iteration": 32,
-          "label": "Physics/spec",
-          "elapsed_sec": 185.7,
-          "mean_power_w": 369.87,
-          "temp_c": 60,
-          "sm_clock_mean_mhz": 2842.7
-        },
-        {
-          "iteration": 33,
-          "label": "Code/base",
-          "elapsed_sec": 192.25,
-          "mean_power_w": 469.03,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2839.9
-        },
-        {
-          "iteration": 34,
-          "label": "Poem/spec",
-          "elapsed_sec": 198.36,
-          "mean_power_w": 353.9,
-          "temp_c": 61,
-          "sm_clock_mean_mhz": 2840.0
-        },
-        {
-          "iteration": 35,
-          "label": "Physics/base",
-          "elapsed_sec": 204.67,
-          "mean_power_w": 469.81,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2840.3
-        },
-        {
-          "iteration": 36,
-          "label": "Code/spec",
-          "elapsed_sec": 208.29,
-          "mean_power_w": 363.54,
-          "temp_c": 59,
-          "sm_clock_mean_mhz": 2841.9
-        },
-        {
-          "iteration": 37,
-          "label": "Poem/base",
-          "elapsed_sec": 214.82,
-          "mean_power_w": 465.85,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2840.6
-        },
-        {
-          "iteration": 38,
-          "label": "Physics/spec",
-          "elapsed_sec": 220.16,
-          "mean_power_w": 368.65,
-          "temp_c": 59,
-          "sm_clock_mean_mhz": 2841.8
-        },
-        {
-          "iteration": 39,
-          "label": "Code/base",
-          "elapsed_sec": 226.71,
-          "mean_power_w": 469.3,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2840.3
-        },
-        {
-          "iteration": 40,
-          "label": "Poem/spec",
-          "elapsed_sec": 232.7,
-          "mean_power_w": 355.38,
-          "temp_c": 59,
-          "sm_clock_mean_mhz": 2841.7
-        },
-        {
-          "iteration": 41,
-          "label": "Physics/base",
-          "elapsed_sec": 239.02,
-          "mean_power_w": 468.37,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2836.2
-        },
-        {
-          "iteration": 42,
-          "label": "Code/spec",
-          "elapsed_sec": 242.64,
-          "mean_power_w": 364.11,
-          "temp_c": 60,
-          "sm_clock_mean_mhz": 2841.2
-        },
-        {
-          "iteration": 43,
-          "label": "Poem/base",
-          "elapsed_sec": 249.2,
-          "mean_power_w": 465.5,
-          "temp_c": 62,
-          "sm_clock_mean_mhz": 2838.6
-        },
-        {
-          "iteration": 44,
-          "label": "Physics/spec",
-          "elapsed_sec": 254.57,
-          "mean_power_w": 368.55,
-          "temp_c": 61,
-          "sm_clock_mean_mhz": 2841.1
-        },
-        {
-          "iteration": 45,
-          "label": "Code/base",
-          "elapsed_sec": 261.12,
-          "mean_power_w": 468.79,
-          "temp_c": 62,
-          "sm_clock_mean_mhz": 2841.1
-        },
-        {
-          "iteration": 46,
-          "label": "Poem/spec",
-          "elapsed_sec": 267.07,
-          "mean_power_w": 355.67,
-          "temp_c": 60,
-          "sm_clock_mean_mhz": 2839.6
-        },
-        {
-          "iteration": 47,
-          "label": "Physics/base",
-          "elapsed_sec": 273.63,
-          "mean_power_w": 467.93,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2838.0
-        },
-        {
-          "iteration": 48,
-          "label": "Code/spec",
-          "elapsed_sec": 277.25,
-          "mean_power_w": 362.63,
-          "temp_c": 60,
-          "sm_clock_mean_mhz": 2839.0
-        },
-        {
-          "iteration": 49,
-          "label": "Poem/base",
-          "elapsed_sec": 283.78,
-          "mean_power_w": 466.95,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2839.8
-        },
-        {
-          "iteration": 50,
-          "label": "Physics/spec",
-          "elapsed_sec": 289.11,
-          "mean_power_w": 369.81,
-          "temp_c": 59,
-          "sm_clock_mean_mhz": 2843.2
-        },
-        {
-          "iteration": 51,
-          "label": "Code/base",
-          "elapsed_sec": 295.66,
-          "mean_power_w": 468.77,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2840.3
-        },
-        {
-          "iteration": 52,
-          "label": "Poem/spec",
-          "elapsed_sec": 301.4,
-          "mean_power_w": 357.91,
+          "elapsed_sec": 164.55,
+          "mean_power_w": 363.8,
           "temp_c": 59,
           "sm_clock_mean_mhz": 2840.2
         },
         {
-          "iteration": 53,
-          "label": "Physics/base",
-          "elapsed_sec": 307.96,
-          "mean_power_w": 469.04,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2836.0
-        },
-        {
-          "iteration": 54,
-          "label": "Code/spec",
-          "elapsed_sec": 311.59,
-          "mean_power_w": 363.34,
-          "temp_c": 60,
-          "sm_clock_mean_mhz": 2838.8
-        },
-        {
-          "iteration": 55,
+          "iteration": 31,
           "label": "Poem/base",
-          "elapsed_sec": 318.13,
-          "mean_power_w": 466.59,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2837.1
+          "elapsed_sec": 170.77,
+          "mean_power_w": 463.39,
+          "temp_c": 62,
+          "sm_clock_mean_mhz": 2836.9
         },
         {
-          "iteration": 56,
+          "iteration": 32,
           "label": "Physics/spec",
-          "elapsed_sec": 323.5,
-          "mean_power_w": 368.66,
-          "temp_c": 59,
-          "sm_clock_mean_mhz": 2841.3
-        },
-        {
-          "iteration": 57,
-          "label": "Code/base",
-          "elapsed_sec": 330.18,
-          "mean_power_w": 461.33,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2839.3
-        },
-        {
-          "iteration": 58,
-          "label": "Poem/spec",
-          "elapsed_sec": 336.4,
-          "mean_power_w": 346.94,
+          "elapsed_sec": 175.76,
+          "mean_power_w": 370.27,
           "temp_c": 60,
-          "sm_clock_mean_mhz": 2840.9
+          "sm_clock_mean_mhz": 2840.7
         },
         {
-          "iteration": 59,
-          "label": "Physics/base",
-          "elapsed_sec": 342.99,
-          "mean_power_w": 466.35,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2837.3
+          "iteration": 33,
+          "label": "Code/base",
+          "elapsed_sec": 182.0,
+          "mean_power_w": 465.77,
+          "temp_c": 62,
+          "sm_clock_mean_mhz": 2836.7
         },
         {
-          "iteration": 60,
-          "label": "Code/spec",
-          "elapsed_sec": 346.65,
-          "mean_power_w": 357.34,
+          "iteration": 34,
+          "label": "Poem/spec",
+          "elapsed_sec": 187.71,
+          "mean_power_w": 356.33,
           "temp_c": 60,
           "sm_clock_mean_mhz": 2839.9
         },
         {
-          "iteration": 61,
-          "label": "Poem/base",
-          "elapsed_sec": 353.27,
-          "mean_power_w": 459.64,
-          "temp_c": 63,
+          "iteration": 35,
+          "label": "Physics/base",
+          "elapsed_sec": 193.97,
+          "mean_power_w": 464.44,
+          "temp_c": 62,
           "sm_clock_mean_mhz": 2837.4
         },
         {
-          "iteration": 62,
-          "label": "Physics/spec",
-          "elapsed_sec": 358.73,
-          "mean_power_w": 361.67,
-          "temp_c": 61,
-          "sm_clock_mean_mhz": 2842.3
-        },
-        {
-          "iteration": 63,
-          "label": "Code/base",
-          "elapsed_sec": 365.36,
-          "mean_power_w": 460.16,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2837.7
-        },
-        {
-          "iteration": 64,
-          "label": "Poem/spec",
-          "elapsed_sec": 371.46,
-          "mean_power_w": 350.46,
-          "temp_c": 59,
-          "sm_clock_mean_mhz": 2840.7
-        },
-        {
-          "iteration": 65,
-          "label": "Physics/base",
-          "elapsed_sec": 378.05,
-          "mean_power_w": 465.88,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2838.6
-        },
-        {
-          "iteration": 66,
+          "iteration": 36,
           "label": "Code/spec",
-          "elapsed_sec": 381.64,
-          "mean_power_w": 364.14,
-          "temp_c": 58,
-          "sm_clock_mean_mhz": 2839.2
-        },
-        {
-          "iteration": 67,
-          "label": "Poem/base",
-          "elapsed_sec": 388.1,
-          "mean_power_w": 463.72,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2838.3
-        },
-        {
-          "iteration": 68,
-          "label": "Physics/spec",
-          "elapsed_sec": 393.36,
-          "mean_power_w": 367.12,
+          "elapsed_sec": 197.35,
+          "mean_power_w": 367.04,
           "temp_c": 61,
-          "sm_clock_mean_mhz": 2839.8
+          "sm_clock_mean_mhz": 2839.9
         },
         {
-          "iteration": 69,
-          "label": "Code/base",
-          "elapsed_sec": 399.91,
-          "mean_power_w": 465.63,
+          "iteration": 37,
+          "label": "Poem/base",
+          "elapsed_sec": 203.53,
+          "mean_power_w": 466.85,
           "temp_c": 63,
-          "sm_clock_mean_mhz": 2834.3
+          "sm_clock_mean_mhz": 2837.1
         },
         {
-          "iteration": 70,
-          "label": "Poem/spec",
-          "elapsed_sec": 406.02,
-          "mean_power_w": 351.85,
+          "iteration": 38,
+          "label": "Physics/spec",
+          "elapsed_sec": 208.5,
+          "mean_power_w": 373.09,
           "temp_c": 59,
-          "sm_clock_mean_mhz": 2841.3
+          "sm_clock_mean_mhz": 2840.6
         },
         {
-          "iteration": 71,
+          "iteration": 39,
+          "label": "Code/base",
+          "elapsed_sec": 214.69,
+          "mean_power_w": 468.67,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2840.5
+        },
+        {
+          "iteration": 40,
+          "label": "Poem/spec",
+          "elapsed_sec": 220.39,
+          "mean_power_w": 358.01,
+          "temp_c": 59,
+          "sm_clock_mean_mhz": 2840.0
+        },
+        {
+          "iteration": 41,
           "label": "Physics/base",
-          "elapsed_sec": 412.6,
-          "mean_power_w": 466.25,
+          "elapsed_sec": 226.64,
+          "mean_power_w": 464.2,
+          "temp_c": 63,
+          "sm_clock_mean_mhz": 2838.2
+        },
+        {
+          "iteration": 42,
+          "label": "Code/spec",
+          "elapsed_sec": 230.05,
+          "mean_power_w": 364.57,
+          "temp_c": 61,
+          "sm_clock_mean_mhz": 2838.8
+        },
+        {
+          "iteration": 43,
+          "label": "Poem/base",
+          "elapsed_sec": 236.28,
+          "mean_power_w": 463.87,
           "temp_c": 63,
           "sm_clock_mean_mhz": 2839.2
         },
         {
-          "iteration": 72,
-          "label": "Code/spec",
-          "elapsed_sec": 416.21,
-          "mean_power_w": 360.97,
-          "temp_c": 59,
-          "sm_clock_mean_mhz": 2842.6
-        },
-        {
-          "iteration": 73,
-          "label": "Poem/base",
-          "elapsed_sec": 422.8,
-          "mean_power_w": 464.22,
-          "temp_c": 63,
-          "sm_clock_mean_mhz": 2839.3
+          "iteration": 44,
+          "label": "Physics/spec",
+          "elapsed_sec": 241.28,
+          "mean_power_w": 372.42,
+          "temp_c": 61,
+          "sm_clock_mean_mhz": 2842.4
         }
-      ]
+      ],
+      "final_power_drift_w_by_label": {
+        "Poem/base": 1.032,
+        "Physics/spec": 2.864,
+        "Code/base": 0.74,
+        "Poem/spec": 0.677,
+        "Physics/base": 2.582,
+        "Code/spec": 0.082
+      },
+      "final_temp_drift_c_by_label": {
+        "Poem/base": 0.333,
+        "Physics/spec": 0.0,
+        "Code/base": 1.0,
+        "Poem/spec": 0.667,
+        "Physics/base": 0.667,
+        "Code/spec": 0.667
+      },
+      "criteria": {
+        "window": 6,
+        "power_tol_fraction": 0.015,
+        "temp_tol_c": 1.0
+      }
     },
     "drift_diagnostics": {
       "pooled": {
         "power_w": {
-          "slope_per_trial": -0.03682245068074564,
-          "r2": 0.00012499234333129827,
-          "total_change_over_run": -2.172524590163993,
-          "fraction_of_mean": -0.005294062894860718,
+          "slope_per_trial": 0.021003889969431967,
+          "r2": 4.4098055442254314e-05,
+          "total_change_over_run": 1.239229508196486,
+          "fraction_of_mean": 0.0030258677407493575,
           "n": 60
         },
         "joules_per_token": {
-          "slope_per_trial": -0.003617620894693019,
-          "r2": 0.0005382765946548851,
-          "total_change_over_run": -0.21343963278688813,
-          "fraction_of_mean": -0.023372634739852488,
+          "slope_per_trial": -0.0034245471519866685,
+          "r2": 0.00047592121505013463,
+          "total_change_over_run": -0.20204828196721344,
+          "fraction_of_mean": -0.022578904075143357,
           "n": 60
         },
         "throughput_tok_sec": {
-          "slope_per_trial": 0.027701583773270158,
-          "r2": 0.0018641020312470946,
-          "total_change_over_run": 1.6343934426229394,
-          "fraction_of_mean": 0.03589207393267514,
+          "slope_per_trial": 0.03341817171436455,
+          "r2": 0.0023377407619690205,
+          "total_change_over_run": 1.9716721311475085,
+          "fraction_of_mean": 0.041232269082105484,
           "n": 60
         },
         "temp_c": {
-          "slope_per_trial": -0.0025840511253132597,
-          "r2": 0.0007965421102229531,
-          "total_change_over_run": -0.15245901639348233,
-          "fraction_of_mean": -0.0024810254905367345,
+          "slope_per_trial": -0.003556543484301877,
+          "r2": 0.0012888945809474972,
+          "total_change_over_run": -0.20983606557381074,
+          "fraction_of_mean": -0.0034231005803231768,
           "n": 60
         },
-        "residual_drift_acceptable": false,
+        "residual_drift_acceptable": true,
         "threshold_fraction": 0.005
       },
       "baseline_only": {
         "power_w": {
-          "slope_per_trial": -0.03773259972489867,
-          "r2": 0.039354389572329174,
-          "total_change_over_run": -2.2262233837690215,
-          "fraction_of_mean": -0.004766485045962965,
+          "slope_per_trial": 0.029768363136174522,
+          "r2": 0.030976473067527377,
+          "total_change_over_run": 1.7563334250342968,
+          "fraction_of_mean": 0.0037854624134300145,
           "n": 30
         },
         "joules_per_token": {
-          "slope_per_trial": 0.0018930280055020202,
-          "r2": 0.08885880170532712,
-          "total_change_over_run": 0.11168865232461919,
-          "fraction_of_mean": 0.009583307515184394,
+          "slope_per_trial": 0.0001648451169188705,
+          "r2": 0.0012212230620072262,
+          "total_change_over_run": 0.00972586189821336,
+          "fraction_of_mean": 0.0008463873233223346,
           "n": 30
         },
         "throughput_tok_sec": {
-          "slope_per_trial": -0.004806052269601037,
-          "r2": 0.023842424350972946,
-          "total_change_over_run": -0.28355708390646117,
-          "fraction_of_mean": -0.007348259419681106,
+          "slope_per_trial": 0.0026762035763411057,
+          "r2": 0.0369315850564117,
+          "total_change_over_run": 0.15789601100412523,
+          "fraction_of_mean": 0.0039391281060803625,
           "n": 30
         },
         "temp_c": {
-          "slope_per_trial": -0.0024759284731772037,
-          "r2": 0.011852849073720084,
-          "total_change_over_run": -0.14607977991745502,
-          "fraction_of_mean": -0.002322413035253657,
+          "slope_per_trial": 0.0011004126547456737,
+          "r2": 0.0031742672733054977,
+          "total_change_over_run": 0.06492434662999474,
+          "fraction_of_mean": 0.001032730858377435,
           "n": 30
         },
         "residual_drift_acceptable": true,
@@ -736,34 +525,34 @@
       },
       "speculative_only": {
         "power_w": {
-          "slope_per_trial": -0.035893909626716826,
-          "r2": 0.005549308918268769,
-          "total_change_over_run": -2.045952848722859,
-          "fraction_of_mean": -0.005784718816573231,
+          "slope_per_trial": 0.012062307044624732,
+          "r2": 0.0006309948977313296,
+          "total_change_over_run": 0.6875515015436098,
+          "fraction_of_mean": 0.0019360976120255545,
           "n": 30
         },
         "joules_per_token": {
-          "slope_per_trial": -0.009239627280381666,
-          "r2": 0.013731974753958598,
-          "total_change_over_run": -0.526658754981755,
-          "fraction_of_mean": -0.07968132523216587,
+          "slope_per_trial": -0.007086472747684524,
+          "r2": 0.008078515427073496,
+          "total_change_over_run": -0.40392894661801787,
+          "fraction_of_mean": -0.06305424071556827,
           "n": 30
         },
         "throughput_tok_sec": {
-          "slope_per_trial": 0.06086612405276493,
-          "r2": 0.00732906489554308,
-          "total_change_over_run": 3.469369071007601,
-          "fraction_of_mean": 0.06610294635874074,
+          "slope_per_trial": 0.06478136401908483,
+          "r2": 0.007468493737809556,
+          "total_change_over_run": 3.692537749087835,
+          "fraction_of_mean": 0.06646833821710973,
           "n": 30
         },
         "temp_c": {
-          "slope_per_trial": -0.0026943586865001874,
-          "r2": 0.00323323042379986,
-          "total_change_over_run": -0.1535784451305107,
-          "fraction_of_mean": -0.0025596407521751782,
+          "slope_per_trial": -0.008307605950042256,
+          "r2": 0.02376660465089442,
+          "total_change_over_run": -0.4735335391524086,
+          "fraction_of_mean": -0.007927458802774697,
           "n": 30
         },
-        "residual_drift_acceptable": false,
+        "residual_drift_acceptable": true,
         "threshold_fraction": 0.005
       }
     },

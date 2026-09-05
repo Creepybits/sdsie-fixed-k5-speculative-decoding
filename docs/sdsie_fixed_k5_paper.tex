@@ -12,6 +12,17 @@
 % below don't need to change.
 \graphicspath{{../}{./}}
 
+% Float placement tuning: figure* (double-column) floats in IEEEtran's
+% two-column layout are otherwise prone to being pushed to the very end of
+% a short paper. Combined with moving the figure*'s source position (see
+% below), this keeps Fig. 1 near page 2 instead of the last page.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.9}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.7}
+\renewcommand{\dbltopfraction}{0.9}
+\renewcommand{\dblfloatpagefraction}{0.7}
+
 \begin{document}
 
 \title{Fixed-K Speculative Decoding for Energy-Proportional LLM Serving: \\
@@ -24,26 +35,46 @@ A Reproducible Empirical Validation}
 
 \maketitle
 
+\begin{figure*}[!t]
+\centering
+\begin{subfigure}{0.48\textwidth}
+\centering
+\includegraphics[width=\linewidth]{assets/throughput_baseline_vs_speculative.png}
+\caption{Throughput}
+\label{fig:throughput}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+\centering
+\includegraphics[width=\linewidth]{assets/energy_per_token_baseline_vs_speculative.png}
+\caption{Energy per token}
+\label{fig:energy}
+\end{subfigure}
+\caption{FP16 baseline vs. fixed-$K{=}5$ speculative decoding, per prompt (N=10 trials/prompt, error bars show $\pm 1$ std. dev.). Gains are smallest on the least predictable content (Poem) and largest on the most predictable (Code).}
+\label{fig:throughput_energy}
+\end{figure*}
+
 \begin{abstract}
 We present an empirical validation of fixed draft-length ($K{=}5$) speculative
 decoding using a scout(1B)$\to$target(8B) model pair on consumer GPU hardware.
 Across three prompt categories spanning low to high output determinism (creative
 poetry, technical explanation, and code generation), we measure throughput,
 energy per token, and output fidelity relative to a matched FP16 autoregressive
-baseline. Speculative decoding achieves up to +78.5\% throughput
-improvement and $-$59.3\% energy reduction per token on
+baseline. Speculative decoding achieves up to +83.5\% throughput
+improvement and $-$60.8\% energy reduction per token on
 code generation, with smaller but consistent gains on less predictable prose
-(+6.7\% / $-$32.2\% on poetry). All results
+(+8.4\% / $-$32.7\% on poetry). All results
 achieve 100\% exact-token-match fidelity against the baseline (lossless,
 greedy decoding) and are independently reproducible from the accompanying
 open-source repository. We report results transparently, including the
 deliberate methodological choice to omit KV-caching from both arms of the
 comparison, which keeps the relative comparison fair but means absolute
 throughput figures are not representative of a production-optimized server,
-and including a documented measurement-methodology correction (a warmup-timing
-bug affecting an earlier version of this result) alongside the closed-loop
-warmup convergence and residual-drift diagnostics now used to guard against a
-recurrence.
+and including two documented measurement-methodology corrections (a
+warmup-timing bug, and subsequently a warmup convergence-criterion bug, both
+affecting earlier versions of this result) alongside the closed-loop warmup
+convergence and residual-drift diagnostics that caught them and now guard
+against a recurrence.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -129,23 +160,37 @@ code only as a fallback and cross-check for hardware that lacks the counter.
 
 Warmup is applied in two layers. First, a one-time \emph{closed-loop thermal
 warmup} runs real, discarded decoding cycles -- alternating across all
-prompts and both the baseline and speculative conditions -- until GPU die
-temperature stops moving across several consecutive readings \emph{and},
-separately, each individual prompt/condition combination's own power reading
-stops moving relative to its own recent history. The latter distinction
-matters because baseline and speculative decoding draw genuinely different
-power by design (see Section~\ref{sec:results}); a convergence check that
+prompts and both the baseline and speculative conditions -- until, for each
+individual prompt/condition combination separately, both its power reading
+and its die-temperature reading stop drifting relative to their own recent
+history. Checking per-combination rather than pooled matters for two
+independent reasons found in sequence. One: baseline and speculative
+decoding draw genuinely different power by design; a convergence check that
 simply requires consecutive readings to agree with each other, without
 accounting for which workload produced them, can fail to terminate when the
-workload alternates between conditions with a real, persistent power gap. An
-earlier version of this warmup procedure additionally used a warmup burst
-length shorter than the real trial length, which was found empirically to
-converge at a lower power/thermal level than the real, longer trial then
-reached -- the first real trial after such a warmup showed the GPU still
-heating measurably mid-measurement. Both issues are corrected in the
-procedure used for the results in this paper: warmup burst length matches
-the real trial length, and convergence is checked per-workload rather than
-across the pooled, alternating sequence. Second, independently of the
+workload alternates between conditions with a real, persistent power gap.
+The other, found only after fixing the first issue: die temperature is not
+actually workload-independent on this hardware -- baseline and speculative
+decoding settle at temperatures roughly 3--4$^\circ$C apart, so pooling
+temperature across both (on the assumption that it is a slow,
+workload-independent signal) produces a permanent oscillation in the
+rolling window that no absolute tolerance can ever satisfy, regardless of
+run length. A separate, independent issue affected the power check alone:
+an absolute tolerance of 1.5~W was tighter than the hardware's own
+sample-to-sample noise floor (measured standard deviation 2.9~W at
+baseline load, 6.8~W at speculative load), making it unsatisfiable on its
+own terms. All three are corrected in the procedure used for this paper:
+warmup burst length matches the real trial length (an earlier version used
+a shorter burst, which was found empirically to converge at a lower
+power/thermal level than the real, longer trial then reached); power and
+temperature are both tracked per prompt/condition combination rather than
+pooled; and convergence for both is judged by a half-split drift statistic
+(the difference between the mean of the newer half and the older half of a
+rolling window) against a tolerance relative to each combination's own mean
+(1.5\% for power, 1$^\circ$C absolute for temperature, empirically already
+well above its own noise floor), rather than raw min-max spread, which
+grows with window length under pure noise and does not isolate drift from
+noise the way a half-split comparison does. Second, independently of the
 closed-loop warmup above, each individual timed trial is still preceded by 5
 short untimed forward-pass warmup steps immediately before its own
 measurement window, avoiding cold-SM effects specific to that trial. This
@@ -203,70 +248,51 @@ $N{=}10$ trials per prompt per condition.
 
 \begin{table*}[t]
 \centering
-\caption{Baseline vs. fixed-$K{=}5$ speculative decoding, per prompt. N=10 trials/prompt. Collected 2026-09-04; see Section~\ref{sec:validity} for the measurement-methodology correction this run reflects.}
+\caption{Baseline vs. fixed-$K{=}5$ speculative decoding, per prompt. N=10 trials/prompt. Collected 2026-09-05, the first run with a fully converged closed-loop warmup (see Section~\ref{sec:validity}).}
 \label{tab:results}
 \begin{tabular}{lccccccc}
 \toprule
 Prompt & Baseline tok/s & Spec. tok/s & Speedup & Baseline J/tok & Spec. J/tok & Energy $\Delta$ & Accept \% \\
 \midrule
-Poem     & 38.42 $\pm$ 0.18 & 40.98 $\pm$ 0.35 & +6.7\% & 11.66 $\pm$ 0.11 & 7.91 $\pm$ 0.10 & $-$32.2\% & 42.5\% \\
-Physics  & 38.45 $\pm$ 0.50 & 47.03 $\pm$ 0.42 & +22.3\% & 11.64 $\pm$ 0.11 & 7.18 $\pm$ 0.12 & $-$38.3\% & 51.7\% \\
-Code     & 38.90 $\pm$ 0.67 & \textbf{69.44 $\pm$ 0.73} & \textbf{+78.5\%} & 11.66 $\pm$ 0.12 & \textbf{4.74 $\pm$ 0.09} & \textbf{$-$59.3\%} & \textbf{85.4\%} \\
+Poem     & 40.16 $\pm$ 0.28 & 43.55 $\pm$ 0.31 & +8.4\% & 11.44 $\pm$ 0.09 & 7.70 $\pm$ 0.06 & $-$32.7\% & 42.5\% \\
+Physics  & 40.05 $\pm$ 0.18 & 49.64 $\pm$ 0.43 & +24.0\% & 11.49 $\pm$ 0.06 & 6.99 $\pm$ 0.06 & $-$39.2\% & 51.7\% \\
+Code     & 40.04 $\pm$ 0.23 & \textbf{73.46 $\pm$ 0.74} & \textbf{+83.5\%} & 11.54 $\pm$ 0.05 & \textbf{4.53 $\pm$ 0.04} & \textbf{$-$60.8\%} & \textbf{85.4\%} \\
 \bottomrule
 \end{tabular}
 \end{table*}
 
-Mean GPU power during speculative decoding (344--363~W) is
+Mean GPU power during speculative decoding (346--364~W) is
 lower than during FP16 baseline decoding
-(466--469~W), despite two models being resident in VRAM
+(463--466~W), despite two models being resident in VRAM
 simultaneously. This is consistent with fewer full 8B-parameter forward
 passes being required per unit of output as accepted draft batch length
 grows -- each accepted cycle of up to $K{+}1{=}6$ tokens requires only one
-target forward pass, versus six for the baseline.
-
-\begin{figure*}[t]
-\centering
-\begin{subfigure}{0.48\textwidth}
-\centering
-\includegraphics[width=\linewidth]{assets/throughput_baseline_vs_speculative.png}
-\caption{Throughput}
-\label{fig:throughput}
-\end{subfigure}
-\hfill
-\begin{subfigure}{0.48\textwidth}
-\centering
-\includegraphics[width=\linewidth]{assets/energy_per_token_baseline_vs_speculative.png}
-\caption{Energy per token}
-\label{fig:energy}
-\end{subfigure}
-\caption{FP16 baseline vs. fixed-$K{=}5$ speculative decoding, per prompt (N=10 trials/prompt, error bars show $\pm 1$ std. dev.). Gains are smallest on the least predictable content (Poem) and largest on the most predictable (Code).}
-\label{fig:throughput_energy}
-\end{figure*}
+target forward pass, versus six for the baseline. Accept rates (42.5\% /
+51.7\% / 85.4\%) and per-prompt throughput/energy figures both agree
+closely with an independent single-run measurement from
+\texttt{speculative\_scout.py} (a separate script sharing only
+\texttt{bench\_common.py}, not the trial-averaging logic), which we take as
+further evidence against measurement artifacts specific to either script.
 
 \subsection{Measurement validity: residual drift diagnostics}
 \label{sec:validity}
 
-After the correction to the warmup procedure described in
+After the corrections to the warmup procedure described in
 Section~\ref{sec:warmup-correction}, each run's per-trial telemetry is
 checked for residual drift: a least-squares fit of power, energy/token, and
-throughput against chronological trial index within the run. For the run
-behind Table~\ref{tab:results}, the fitted trend was negligible for every
-metric, pooled and per-condition ($R^2 \le 0.09$ in all cases, most
-$R^2 \approx 0$), and the total drift over the full 60-trial run was small
-in absolute terms ($\approx -2$~W against a pooled mean of $\approx 410$~W).
-The accompanying code's pass/fail threshold ($\pm 0.5\%$ of the mean) flagged
-this run regardless (pooled $-0.53\%$; speculative-only $-0.58\%$;
-baseline-only passed at $-0.48\%$), since that threshold does not account
-for $R^2$. We report both numbers here rather than silently relying on the
-pass/fail flag: a near-zero $R^2$ alongside a sub-1\%-of-mean total change is
-consistent with ordinary run-to-run measurement noise rather than a
-systematic thermal trend contaminating the reported means, and we treat the
-results in Table~\ref{tab:results} as valid on that basis. Separately, the
-closed-loop warmup itself did not fully converge within its time cap on this
-specific run (WSL2 GPU power-reporting granularity appears coarser than the
-convergence tolerance can reliably satisfy); the drift diagnostic above is
-the safeguard designed for exactly this situation, and it returned a clean
-result.
+throughput against chronological trial index within the run. The run behind
+Table~\ref{tab:results} is the first on this project with a closed-loop
+warmup that fully converged within its time cap (241.3~s, well under the
+420~s cap; every prior run had hit the cap without converging) and the
+cleanest drift diagnostics observed to date: the fitted trend was
+negligible for every metric, pooled and per-condition ($R^2$ between
+$4\times10^{-5}$ and $0.037$ across all cases), and the accompanying code's
+pass/fail threshold ($\pm 0.5\%$ of the mean) passed cleanly on every check
+(pooled $0.30\%$; baseline-only $0.38\%$; speculative-only $0.19\%$) --
+unlike earlier runs, where the threshold fired despite a near-zero $R^2$ and
+had to be interpreted rather than simply read off. We treat the results in
+Table~\ref{tab:results} as the most reliable of this project to date on that
+basis.
 
 \subsection{Speedup and energy reduction scale with acceptance rate}
 

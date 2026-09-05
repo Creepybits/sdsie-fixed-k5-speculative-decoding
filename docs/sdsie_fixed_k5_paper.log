@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.8.21)  5 SEP 2026 19:11
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.8.21)  6 SEP 2026 00:09
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -424,24 +424,24 @@ File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
 (./sdsie_fixed_k5_paper.aux)
 \openout1 = `sdsie_fixed_k5_paper.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 15.
-LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
 
 -- Lines per column: 56 (exact).
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
@@ -469,187 +469,205 @@ e
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
 Package caption Info: End \AtBeginDocument code.
-Package hyperref Info: Link coloring OFF on input line 15.
+Package hyperref Info: Link coloring OFF on input line 26.
 
 (./sdsie_fixed_k5_paper.out) (./sdsie_fixed_k5_paper.out)
 \@outlinefile=\write3
 \openout3 = `sdsie_fixed_k5_paper.out'.
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 28.
+<../assets/throughput_baseline_vs_speculative.png, id=88, 505.89pt x 361.35pt>
+File: ../assets/throughput_baseline_vs_speculative.png Graphic file (type png)
+<use ../assets/throughput_baseline_vs_speculative.png>
+Package pdftex.def Info: ../assets/throughput_baseline_vs_speculative.png  used
+ on input line 42.
+(pdftex.def)             Requested size: 247.6778pt x 176.91417pt.
+<../assets/energy_per_token_baseline_vs_speculative.png, id=90, 505.89pt x 361.
+35pt>
+File: ../assets/energy_per_token_baseline_vs_speculative.png Graphic file (type
+ png)
+<use ../assets/energy_per_token_baseline_vs_speculative.png>
+Package pdftex.def Info: ../assets/energy_per_token_baseline_vs_speculative.png
+  used on input line 49.
+(pdftex.def)             Requested size: 247.6778pt x 176.91417pt.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 53.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 28.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 53.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-)
-LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 1
-21.
+) [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texm
+f-dist/fonts/enc/dvips/base/8r.enc}
 
-(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1pcr.fd
+
+]
+LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 1
+52.
+ (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
-Underfull \hbox (badness 10000) in paragraph at lines 118--126
+Underfull \hbox (badness 10000) in paragraph at lines 149--157
 []\OT1/ptm/m/n/10 GPU power is sam-pled via NVML at 100 Hz
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 118--126
+Underfull \hbox (badness 10000) in paragraph at lines 149--157
 \OT1/ptm/m/n/10 on a back-ground thread through-out each timed
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 118--126
+Underfull \hbox (badness 10000) in paragraph at lines 149--157
 \OT1/ptm/m/n/10 gen-er-a-tion win-dow. En-ergy per to-ken is read
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 118--126
+Underfull \hbox (badness 10000) in paragraph at lines 149--157
 \OT1/ptm/m/n/10 from the GPU's on-board hard-ware en-ergy counter
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 118--126
+Underfull \hbox (badness 10000) in paragraph at lines 149--157
 \OT1/ptm/m/n/10 (\OT1/pcr/m/n/10 nvmlDeviceGetTotalEnergyConsumption\OT1/ptm/m/
 n/10 ) when
  []
 
 
-Underfull \hbox (badness 1509) in paragraph at lines 118--126
+Underfull \hbox (badness 1509) in paragraph at lines 149--157
 \OT1/ptm/m/n/10 di-vided by $\OML/cmm/m/it/10 N[]$\OT1/ptm/m/n/10 , the num-ber
  of to-kens pro-duced. This
  []
 
 
-Underfull \hbox (badness 1521) in paragraph at lines 118--126
+Underfull \hbox (badness 1521) in paragraph at lines 149--157
 \OT1/ptm/m/n/10 is a more di-rect mea-sure-ment than in-te-grat-ing sam-pled
  []
 
 
-Underfull \hbox (badness 2020) in paragraph at lines 118--126
+Underfull \hbox (badness 2020) in paragraph at lines 149--157
 \OT1/ptm/m/n/10 in-stan-ta-neous power read-ings, which is re-tained in the
  []
 
-[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-
-dist/fonts/enc/dvips/base/8r.enc}
 
-
-]
-Underfull \hbox (badness 2189) in paragraph at lines 130--155
-\OT1/ptm/m/n/10 Sec-tion []III[]); a con-ver-gence check that sim-ply re-quires
-
+Underfull \hbox (badness 2229) in paragraph at lines 161--200
+[]\OT1/ptm/m/n/10 Warmup is ap-plied in two lay-ers. First, a one-time
  []
 
 
-Underfull \hbox (badness 1910) in paragraph at lines 130--155
-\OT1/ptm/m/n/10 con-sec-u-tive read-ings to agree with each other, with-out
+Underfull \hbox (badness 2486) in paragraph at lines 161--200
+\OT1/ptm/m/n/10 and spec-u-la-tive con-di-tions -- un-til, for each in-di-vid-u
+al
  []
 
 
-Underfull \hbox (badness 2753) in paragraph at lines 130--155
-\OT1/ptm/m/n/10 per-workload rather than across the pooled, al-ter-nat-ing
+Underfull \hbox (badness 2096) in paragraph at lines 161--200
+\OT1/ptm/m/n/10 prompt/condition com-bi-na-tion sep-a-rately, both its power
  []
 
 
-Underfull \hbox (badness 4940) in paragraph at lines 130--155
+Underfull \hbox (badness 1648) in paragraph at lines 161--200
+\OT1/ptm/m/n/10 other, with-out ac-count-ing for which work-load pro-duced
+ []
+
+
+Underfull \hbox (badness 1571) in paragraph at lines 161--200
+\OT1/ptm/m/n/10 base-line and spec-u-la-tive de-cod-ing set-tle at tem-per-a-tu
+res
+ []
+
+
+Underfull \hbox (badness 2142) in paragraph at lines 161--200
+\OT1/ptm/m/n/10 sig-nal) pro-duces a per-ma-nent os-cil-la-tion in the rolling
+ []
+
+
+Underfull \hbox (badness 1394) in paragraph at lines 161--200
+\OT1/ptm/m/n/10 does. Sec-ond, in-de-pen-dently of the closed-loop warmup
+ []
+
+
+Underfull \hbox (badness 4940) in paragraph at lines 161--200
 \OT1/ptm/m/n/10 arms of the com-par-i-son (\OT1/pcr/m/n/10 benchmark_ablation.p
 y
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 130--155
+Underfull \hbox (badness 10000) in paragraph at lines 161--200
 \OT1/ptm/m/n/10 and \OT1/pcr/m/n/10 speculative_scout.py\OT1/ptm/m/n/10 ) via a
  com-mon
  []
 
-
-Underfull \hbox (badness 3954) in paragraph at lines 195--198
+[2 <../assets/throughput_baseline_vs_speculative.png> <../assets/energy_per_tok
+en_baseline_vs_speculative.png>]
+Underfull \hbox (badness 3954) in paragraph at lines 240--243
 []\OT1/ptm/m/n/10 Aggregate exact-token-match fi-delity across all three
  []
 
 
-Underfull \hbox (badness 1622) in paragraph at lines 219--226
-[]\OT1/ptm/m/n/10 Mean GPU power dur-ing spec-u-la-tive de-cod-ing (344--
+Underfull \hbox (badness 1622) in paragraph at lines 264--276
+[]\OT1/ptm/m/n/10 Mean GPU power dur-ing spec-u-la-tive de-cod-ing (346--
  []
 
-<../assets/throughput_baseline_vs_speculative.png, id=112, 505.89pt x 361.35pt>
-
-File: ../assets/throughput_baseline_vs_speculative.png Graphic file (type png)
-<use ../assets/throughput_baseline_vs_speculative.png>
-Package pdftex.def Info: ../assets/throughput_baseline_vs_speculative.png  used
- on input line 231.
-(pdftex.def)             Requested size: 247.6778pt x 176.91417pt.
-<../assets/energy_per_token_baseline_vs_speculative.png, id=114, 505.89pt x 361
-.35pt>
-File: ../assets/energy_per_token_baseline_vs_speculative.png Graphic file (type
- png)
-<use ../assets/energy_per_token_baseline_vs_speculative.png>
-Package pdftex.def Info: ../assets/energy_per_token_baseline_vs_speculative.png
-  used on input line 238.
-(pdftex.def)             Requested size: 247.6778pt x 176.91417pt.
-[2]
 <../assets/speedup_vs_accept_rate.png, id=128, 433.62pt x 361.35pt>
 File: ../assets/speedup_vs_accept_rate.png Graphic file (type png)
 <use ../assets/speedup_vs_accept_rate.png>
 Package pdftex.def Info: ../assets/speedup_vs_accept_rate.png  used on input li
-ne 281.
+ne 307.
 (pdftex.def)             Requested size: 226.79846pt x 189.00032pt.
- [3 <../assets/throughput_baseline_vs_speculative.png> <../assets/energy_per_to
-ken_baseline_vs_speculative.png> <../assets/speedup_vs_accept_rate.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 307--316
+[3 <../assets/speedup_vs_accept_rate.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 333--342
 []\OT1/ptm/m/n/10 All code, raw teleme-try (JSON/CSV), and the
  []
 
 
-Underfull \hbox (badness 1478) in paragraph at lines 307--316
+Underfull \hbox (badness 1478) in paragraph at lines 333--342
 \OT1/ptm/m/n/10 scripts used to gen-er-ate ev-ery fig-ure and ta-ble in this
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 307--316
+Underfull \hbox (badness 10000) in paragraph at lines 333--342
 \OT1/ptm/m/n/10 pa-per are avail-able at []$https : / / github . com / Creepybi
 ts /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 307--316
+Underfull \hbox (badness 10000) in paragraph at lines 333--342
 \OT1/ptm/m/n/10 sdsie-[]^^Lxed-[]k5-[]speculative-[]decoding$[] un-der an Apach
 e-
  []
 
 
-Underfull \hbox (badness 7685) in paragraph at lines 307--316
+Underfull \hbox (badness 7685) in paragraph at lines 333--342
 \OT1/ptm/m/n/10 2.0 li-cense. Re-ported num-bers are di-rectly trace-able
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 307--316
+Underfull \hbox (badness 10000) in paragraph at lines 333--342
 \OT1/ptm/m/n/10 to \OT1/pcr/m/n/10 telemetry/ablation_results.json\OT1/ptm/m/n/
 10 ,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 307--316
+Underfull \hbox (badness 10000) in paragraph at lines 333--342
 \OT1/ptm/m/n/10 gen-er-ated by \OT1/pcr/m/n/10 benchmark_ablation.py \OT1/ptm/m
 /n/10 in that
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 307--316
+Underfull \hbox (badness 10000) in paragraph at lines 333--342
 \OT1/ptm/m/n/10 repos-i-tory. The closed-loop warmup and drift-
  []
 
 
-Underfull \hbox (badness 3623) in paragraph at lines 307--316
+Underfull \hbox (badness 3623) in paragraph at lines 333--342
 \OT1/ptm/m/n/10 diagnostic logic de-scribed in Sec-tions [][][] and [][][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 307--316
+Underfull \hbox (badness 10000) in paragraph at lines 333--342
 \OT1/ptm/m/n/10 is shared be-tween \OT1/pcr/m/n/10 benchmark_ablation.py \OT1/p
 tm/m/n/10 and
  []
@@ -682,7 +700,7 @@ Here is how much of TeX's memory you used:
  33840 multiletter control sequences out of 15000+600000
  599801 words of font info for 117 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 75i,9n,79p,414b,518s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,9n,79p,414b,517s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texliv
@@ -697,10 +715,10 @@ sr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texliv
 e/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/share/texlive/texmf-dist/f
 onts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/
 times/utmri8a.pfb>
-Output written on sdsie_fixed_k5_paper.pdf (4 pages, 333193 bytes).
+Output written on sdsie_fixed_k5_paper.pdf (4 pages, 331350 bytes).
 PDF statistics:
- 221 PDF objects out of 1000 (max. 8388607)
- 176 compressed objects within 2 object streams
+ 220 PDF objects out of 1000 (max. 8388607)
+ 175 compressed objects within 2 object streams
  32 named destinations out of 1000 (max. 500000)
  184 words of extra memory for PDF output out of 10000 (max. 10000000)
 
