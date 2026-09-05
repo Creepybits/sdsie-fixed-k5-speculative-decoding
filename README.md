@@ -48,7 +48,7 @@ Mean GPU power during speculative runs (344–363 W) is lower than during the FP
 baseline (466–469 W) despite two resident models, consistent with fewer full
 8B-parameter forward passes required per unit of output as accepted draft batches grow.
 
-### Why these prompts
+## Why these prompts
 
 The three prompts span a range of *token-level predictability* for the model, not
 difficulty for a person — and that distinction matters, because the results above can
