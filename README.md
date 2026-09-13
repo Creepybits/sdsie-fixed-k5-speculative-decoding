@@ -159,7 +159,7 @@ benchmarks/
   bench_common.py         - Shared NVML monitor, closed-loop warmup, accept/reject decode
                              loop, and drift diagnostics used by benchmark_ablation.py and
                              speculative_scout.py
-  plot_ablation_results.py, rebuild_summary.py
+  plot_ablation_results.py, 
 docs/
   sdsie_fixed_k5_paper.tex / .pdf  - The paper (see below), figures pulled from assets/
 telemetry/                 - Raw JSON/CSV output from the runs behind the table above
