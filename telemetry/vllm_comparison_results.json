@@ -1,0 +1,117 @@
+{
+  "by_prompt": {
+    "Poem": {
+      "vLLM FP16 Baseline (KV-cached)": {
+        "tps_mean": 100.559,
+        "tps_std": 0.6620490918353412,
+        "j_tok_mean": 4.4192728,
+        "j_tok_std": 0.07225596534100154,
+        "n_trials": 10
+      },
+      "vLLM Speculative K=5 (KV-cached)": {
+        "tps_mean": 123.11099999999999,
+        "tps_std": 0.8918682638147841,
+        "j_tok_mean": 2.7250576,
+        "j_tok_std": 0.0589301575548547,
+        "n_trials": 10
+      }
+    },
+    "Physics": {
+      "vLLM FP16 Baseline (KV-cached)": {
+        "tps_mean": 100.779,
+        "tps_std": 0.6801389563905308,
+        "j_tok_mean": 4.370317999999999,
+        "j_tok_std": 0.08901928546556656,
+        "n_trials": 10
+      },
+      "vLLM Speculative K=5 (KV-cached)": {
+        "tps_mean": 151.803,
+        "tps_std": 0.767450975632976,
+        "j_tok_mean": 2.2244596000000003,
+        "j_tok_std": 0.06885906333257807,
+        "n_trials": 10
+      }
+    },
+    "Code": {
+      "vLLM FP16 Baseline (KV-cached)": {
+        "tps_mean": 100.76,
+        "tps_std": 0.7042868733690859,
+        "j_tok_mean": 4.3679836000000005,
+        "j_tok_std": 0.08661619101207357,
+        "n_trials": 10
+      },
+      "vLLM Speculative K=5 (KV-cached)": {
+        "tps_mean": 201.38900000000004,
+        "tps_std": 1.646842129652994,
+        "j_tok_mean": 1.6881736,
+        "j_tok_std": 0.06692444059863333,
+        "n_trials": 10
+      }
+    }
+  },
+  "_meta": {
+    "baseline_run": {
+      "timestamp": "2026-09-18T18:07:34.053953",
+      "device": {
+        "device_index": 0,
+        "energy_counter_supported": true,
+        "name": "NVIDIA GeForce RTX 5090",
+        "driver_version": "616.92",
+        "power_limit_w": 600.0,
+        "max_sm_clock_mhz": 3090,
+        "max_mem_clock_mhz": 14001
+      },
+      "config": {
+        "target_model": "meta-llama/Llama-3.1-8B-Instruct",
+        "scout_model": null,
+        "num_speculative_tokens": null,
+        "max_tokens": 250,
+        "max_model_len": 2048,
+        "warmup_seconds": 150.0,
+        "per_trial_warmup_steps": 5,
+        "num_trials": 10,
+        "kv_caching": true,
+        "vllm_wsl2_pin_memory": "1",
+        "vllm_flashinfer_sampler": "0"
+      },
+      "warmup": {
+        "converged": true,
+        "elapsed_sec": 150.27,
+        "iterations": 60
+      },
+      "poll_errors": 0
+    },
+    "speculative_run": {
+      "timestamp": "2026-09-18T18:12:22.002477",
+      "device": {
+        "device_index": 0,
+        "energy_counter_supported": true,
+        "name": "NVIDIA GeForce RTX 5090",
+        "driver_version": "616.92",
+        "power_limit_w": 600.0,
+        "max_sm_clock_mhz": 3090,
+        "max_mem_clock_mhz": 14001
+      },
+      "config": {
+        "target_model": "meta-llama/Llama-3.1-8B-Instruct",
+        "scout_model": "meta-llama/Llama-3.2-1B-Instruct",
+        "num_speculative_tokens": 5,
+        "max_tokens": 250,
+        "max_model_len": 2048,
+        "warmup_seconds": 150.0,
+        "per_trial_warmup_steps": 5,
+        "num_trials": 10,
+        "kv_caching": true,
+        "vllm_wsl2_pin_memory": "1",
+        "vllm_flashinfer_sampler": "0"
+      },
+      "warmup": {
+        "converged": true,
+        "elapsed_sec": 150.85,
+        "iterations": 91
+      },
+      "poll_errors": 0
+    }
+  },
+  "_caveat": "NOT directly comparable to benchmark_ablation.py's numbers -- this run uses vLLM's default KV-caching, the existing repo numbers deliberately do not. See this script's module docstring."
+}

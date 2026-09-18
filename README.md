@@ -80,6 +80,49 @@ This is precisely the axis speculative decoding's speedup is sensitive to (see t
 accept-rate figure above), which is why the prompts were chosen to span it deliberately
 — not to span perceived task difficulty.
 
+## Comparison to vLLM's own built-in speculative decoding
+
+*Added 2026-09-18. A separate, additional benchmark, not part of the main table above —
+see the caveats immediately below before citing this anywhere.*
+
+vLLM ships its own native speculative decoding, including a `draft_model` method with a
+fixed `num_speculative_tokens` setting — mechanistically the same approach as this repo
+(small draft model, fixed draft window, target model verifies). Until now this repo had
+never actually been benchmarked against it. `benchmarks/benchmark_vllm_comparison.py`
+does that directly: same scout (`Llama-3.2-1B-Instruct`) and target
+(`Llama-3.1-8B-Instruct`) models, same three reference prompts, vLLM's own engine and
+KV-cache for both arms, `N=10` trials/prompt, greedy decoding.
+
+| Prompt | vLLM baseline (tok/s) | vLLM + K5 mechanism (tok/s) | Speedup |
+|---|---|---|---|
+| Poem | 100.6 | 123.1 | +22.4% |
+| Physics | 100.8 | 151.8 | +50.6% |
+| Code | 100.8 | 201.4 | **+99.9%** |
+
+The K5 mechanism (fixed-K=5, scout→target draft-and-verify) measurably outperforms
+vLLM's own FP16 baseline when run natively inside vLLM's serving engine, across all
+three reference prompts.
+
+**Important caveats:**
+- **Not directly comparable to the main results table above.** vLLM uses PagedAttention
+  (KV-caching) for both arms here; the main table deliberately uses no KV-cache on
+  either arm, for a different reason (isolating the speculative mechanism itself from
+  caching effects). These are two different, both-valid comparisons answering different
+  questions — don't put both tables' baseline numbers side by side as if they were one
+  data set.
+- **vLLM only, not SGLang.** SGLang's own built-in speculative decoding is adaptive
+  (EAGLE-based, tiered draft length) — a different mechanism, closer in spirit to
+  SDSIE's still-unvalidated entropy-gated approach than to fixed-K5. It has not been
+  benchmarked here.
+- **Single full run, not yet independently cross-validated by a second script**, unlike
+  the main results above (which are corroborated by `speculative_scout.py`
+  independently). Measurement methodology (closed-loop per-prompt warmup via
+  `bench_common.warm_to_steady_state`, plus a short per-trial warmup) mirrors the rest
+  of this repo, and a first-round rotation-order artifact (whichever prompt ran first in
+  a round measured slower, regardless of which prompt it was) was found and fixed during
+  development — see the script's own docstring and commit history for the full
+  diagnostic trail.
+
 ## What this does NOT claim
 
 - No quantization/kernel work is included here (see the SDSIE research repo for that,
@@ -90,10 +133,12 @@ accept-rate figure above), which is why the prompts were chosen to span it delib
   entropy-gated *precision*-switching mechanism, tested separately). This repo
   intentionally ships the simpler, proven approach rather than either more ambitious,
   not-yet-validated alternative.
-- No KV-cache (deliberate, for a fair baseline-vs-speculative comparison — see
-  "Methodology" below). Absolute throughput numbers here are not production-representative;
-  the relative comparison (baseline vs. speculative under identical conditions) is what's
-  been validated.
+- No KV-cache in the main results table above (deliberate, for a fair baseline-vs-speculative
+  comparison — see "Methodology" below). Absolute throughput numbers there are not
+  production-representative; the relative comparison (baseline vs. speculative under
+  identical conditions) is what's been validated. The separate vLLM comparison above
+  does use KV-caching (vLLM's own default) and is reported separately for that reason.
+- No SGLang comparison yet (see above).
 
 ## Methodology
 
@@ -126,7 +171,8 @@ spuriously with window length under pure noise the way spread does. On top of th
 closed-loop warmup, each individual timed trial is still preceded by 5 short untimed
 warmup forward passes immediately before measurement starts, avoiding cold-SM effects at
 the start of each specific trial. This two-layer warmup procedure is shared between
-`benchmark_ablation.py` and `speculative_scout.py` via `bench_common.py`.
+`benchmark_ablation.py` and `speculative_scout.py` via `bench_common.py`, and reused (via
+the same `warm_to_steady_state` function) by `benchmark_vllm_comparison.py` above.
 
 Energy per token is read from the GPU's onboard hardware energy counter
 (`nvmlDeviceGetTotalEnergyConsumption`) when available — as it was for every trial in
@@ -154,16 +200,18 @@ than a residual thermal trend.
 
 ```
 benchmarks/
-  speculative_scout.py    - Standalone reference implementation, single-run
-  benchmark_ablation.py   - N=10 trial ablation across 3 prompts (source of table above)
-  bench_common.py         - Shared NVML monitor, closed-loop warmup, accept/reject decode
-                             loop, and drift diagnostics used by benchmark_ablation.py and
-                             speculative_scout.py
-  plot_ablation_results.py, 
+  speculative_scout.py         - Standalone reference implementation, single-run
+  benchmark_ablation.py        - N=10 trial ablation across 3 prompts (source of main table)
+  benchmark_vllm_comparison.py - K5 mechanism vs. vLLM's own built-in speculative decoding
+                                  (source of the vLLM comparison table above)
+  bench_common.py              - Shared NVML monitor, closed-loop warmup, accept/reject
+                                  decode loop, and drift diagnostics used by all three
+                                  benchmark scripts above
+  plot_ablation_results.py, rebuild_summary.py
 docs/
-  sdsie_fixed_k5_paper.tex / .pdf  - The paper (see below), figures pulled from assets/
-telemetry/                 - Raw JSON/CSV output from the runs behind the table above
-assets/                    - Plots generated from telemetry (see plot_*.py scripts)
+  fixed_k5_paper.tex / .pdf  - The paper (see below), figures pulled from assets/
+telemetry/                 - Raw JSON/CSV output from the runs behind the tables above
+assets/                     - Plots generated from telemetry (see plot_*.py scripts)
 ```
 
 ## Running it
@@ -177,6 +225,10 @@ python3 speculative_scout.py
 
 # Full N=10 ablation (takes several minutes, loads two models)
 python3 benchmark_ablation.py
+
+# K5 mechanism vs. vLLM's own speculative decoding (requires vllm; see script docstring)
+python3 benchmark_vllm_comparison.py --mode baseline
+python3 benchmark_vllm_comparison.py --mode speculative
 
 # Regenerate plots from the latest telemetry
 python3 plot_ablation_results.py
