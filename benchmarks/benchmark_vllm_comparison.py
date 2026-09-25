@@ -87,6 +87,16 @@ from transformers import AutoTokenizer
 from vllm import LLM, SamplingParams
 
 import bench_common
+from vllm.v1.metrics.reader import Counter, Vector
+
+# K5's own already-verified accept rates (this repo's ablation_results.json /
+# K5_status.md, 2026-09-05 cont. 2 run) -- carried forward here ONLY as a
+# reference point to print alongside vLLM's own measured number below, not
+# asserted or treated as ground truth. If these two numbers land close
+# together, that's real, independent evidence the two implementations
+# compute acceptance the same way; if they don't, that needs investigating
+# before either number is cited anywhere.
+REFERENCE_K5_ACCEPT_PCT_BY_LABEL = {"Poem": 42.5, "Physics": 51.7, "Code": 85.4}
 
 TARGET_MODEL_ID = "meta-llama/Llama-3.1-8B-Instruct"
 SCOUT_MODEL_ID = "meta-llama/Llama-3.2-1B-Instruct"
@@ -159,6 +169,14 @@ def build_engine(mode: str, gpu_memory_utilization: float, max_model_len: int) -
         dtype="bfloat16",
         gpu_memory_utilization=gpu_memory_utilization,
         max_model_len=max_model_len,
+        # Explicit, not left to whatever this vLLM version defaults to --
+        # spec_decode_offline.py (vLLM's own example script) sets this
+        # explicitly too. Needed for llm.get_metrics() to return the
+        # vllm:spec_decode_* counters at all; without it, the first attempt
+        # at capturing acceptance rate here (2026-09-19) came back with every
+        # counter at zero despite genuinely-working, genuinely-faster
+        # speculative decoding -- a metrics-collection gap, not a real zero.
+        disable_log_stats=False,
     )
     if mode == "speculative":
         kwargs["speculative_config"] = {
@@ -221,8 +239,32 @@ def per_trial_warmup(llm, prompt_text, n_steps):
         llm.generate([prompt_text], SamplingParams(temperature=0.0, max_tokens=8), use_tqdm=False)
 
 
+def spec_decode_snapshot(llm):
+    """Cumulative vLLM speculative-decode counters as of right now (this
+    engine instance, since it started -- NOT per-request). Used as a
+    before/after snapshot around a single generate() call so the DELTA
+    isolates that one call's contribution, regardless of what warmup or
+    earlier trials already accumulated. Returns zeros if this engine has no
+    speculative_config (baseline mode) or if these metrics aren't present
+    for any other reason -- callers should treat an all-zero delta as "not
+    applicable", not as "zero tokens accepted"."""
+    num_drafts = num_draft_tokens = num_accepted_tokens = 0
+    try:
+        for metric in llm.get_metrics():
+            if metric.name == "vllm:spec_decode_num_drafts":
+                num_drafts += metric.value
+            elif metric.name == "vllm:spec_decode_num_draft_tokens":
+                num_draft_tokens += metric.value
+            elif metric.name == "vllm:spec_decode_num_accepted_tokens":
+                num_accepted_tokens += metric.value
+    except Exception:
+        pass
+    return num_drafts, num_draft_tokens, num_accepted_tokens
+
+
 def run_trial(llm, monitor, prompt_text, label, round_idx, sampling_params,
-              condition_key, global_index):
+              condition_key, global_index, capture_spec_metrics=False):
+    spec_before = spec_decode_snapshot(llm) if capture_spec_metrics else None
     e_start = monitor.read_energy_j()
     t_start = time.perf_counter()
 
@@ -231,6 +273,26 @@ def run_trial(llm, monitor, prompt_text, label, round_idx, sampling_params,
     torch.cuda.synchronize()
     t_end = time.perf_counter()
     e_end = monitor.read_energy_j()
+    spec_after = spec_decode_snapshot(llm) if capture_spec_metrics else None
+
+    if capture_spec_metrics and global_index == 1:
+        # One-time raw dump, first speculative trial only. If disable_log_stats
+        # alone doesn't fix the zero-counters problem found 2026-09-19, this
+        # shows the ACTUAL metric names/values this vLLM version exposes,
+        # rather than guessing a second wrong metric name blind.
+        print("\n[DEBUG] Raw output of llm.get_metrics() after first speculative trial:")
+        try:
+            all_metrics = llm.get_metrics()
+            if not all_metrics:
+                print("    (empty list -- get_metrics() returned nothing at all)")
+            for m in all_metrics:
+                val = getattr(m, "value", None)
+                if val is None:
+                    val = getattr(m, "values", None)
+                print(f"    {m.name} = {val}")
+        except Exception as exc:
+            print(f"    [!] get_metrics() raised {type(exc).__name__}: {exc}")
+        print()
 
     stats = monitor.window_stats(t_start, t_end)
     generated_ids = list(outputs[0].outputs[0].token_ids)
@@ -259,6 +321,23 @@ def run_trial(llm, monitor, prompt_text, label, round_idx, sampling_params,
         "throttle_reasons": monitor.throttle_reasons(),
         "generated_ids": generated_ids,  # for fidelity check only, stripped before CSV
     }
+    if capture_spec_metrics and spec_before is not None and spec_after is not None:
+        d_drafts = spec_after[0] - spec_before[0]
+        d_draft_tokens = spec_after[1] - spec_before[1]
+        d_accepted = spec_after[2] - spec_before[2]
+        entry["vllm_spec_num_drafts"] = d_drafts
+        entry["vllm_spec_num_draft_tokens"] = d_draft_tokens
+        entry["vllm_spec_num_accepted_tokens"] = d_accepted
+        # Per-token accept rate, matching K5's own definition exactly:
+        # total_accepted / total_drafted across individual draft-token
+        # positions (bench_common.speculative_generate's total_accepted /
+        # total_drafted) -- NOT vLLM's own "mean acceptance length" metric,
+        # which is a different quantity (1 + accepted/num_drafts, i.e. mean
+        # run length including the bonus token). Using the same definition
+        # on both sides is the whole point of this comparison.
+        entry["vllm_accept_rate_pct"] = (
+            round(100 * d_accepted / d_draft_tokens, 2) if d_draft_tokens > 0 else None
+        )
     csv_entry = {k: v for k, v in entry.items() if k != "generated_ids"}
     bench_common.safe_append_csv(TRIAL_CSV, csv_entry)
     return entry
@@ -375,10 +454,13 @@ def main():
             gidx += 1
             per_trial_warmup(llm, text, args.per_trial_warmup_steps)
             entry = run_trial(llm, monitor, text, label, round_idx, sampling_params,
-                               condition_key, gidx)
+                               condition_key, gidx,
+                               capture_spec_metrics=(args.mode == "speculative"))
+            accept_str = (f"  accept={entry['vllm_accept_rate_pct']}%"
+                          if entry.get('vllm_accept_rate_pct') is not None else "")
             print(f"  {label:<8} round {round_idx}/{args.trials}  "
                   f"tok/s={entry['throughput_tok_sec']:<7} "
-                  f"J/tok={entry['joules_per_token']}  P={entry['avg_power_watts']} W")
+                  f"J/tok={entry['joules_per_token']}  P={entry['avg_power_watts']} W{accept_str}")
             chronological.append(entry)
 
     monitor.close()
@@ -394,13 +476,20 @@ def main():
         trials = [e for e in chronological if e["prompt_label"] == label]
         tps = [t["throughput_tok_sec"] for t in trials]
         j = [t["joules_per_token"] for t in trials if t["joules_per_token"] is not None]
-        by_prompt.setdefault(label, {})[condition_key] = {
+        accept_rates = [t["vllm_accept_rate_pct"] for t in trials
+                        if t.get("vllm_accept_rate_pct") is not None]
+        summary = {
             "tps_mean": float(np.mean(tps)),
             "tps_std": float(np.std(tps)),
             "j_tok_mean": float(np.mean(j)) if j else None,
             "j_tok_std": float(np.std(j)) if j else 0.0,
             "n_trials": len(trials),
         }
+        if accept_rates:
+            summary["vllm_accept_rate_pct_mean"] = float(np.mean(accept_rates))
+            summary["vllm_accept_rate_pct_std"] = float(np.std(accept_rates))
+            summary["k5_reference_accept_pct"] = REFERENCE_K5_ACCEPT_PCT_BY_LABEL.get(label)
+        by_prompt.setdefault(label, {})[condition_key] = summary
 
     existing["by_prompt"] = by_prompt
     existing.setdefault("_meta", {})[f"{args.mode}_run"] = {
@@ -448,6 +537,11 @@ def main():
                 speedup = (s["tps_mean"] / b["tps_mean"] - 1) * 100
                 print(f"  {label:<8} baseline={b['tps_mean']:.1f} tok/s  "
                       f"speculative={s['tps_mean']:.1f} tok/s  ({speedup:+.1f}%)")
+                if s.get("vllm_accept_rate_pct_mean") is not None:
+                    k5_ref = s.get("k5_reference_accept_pct")
+                    ref_str = f" vs. this repo's own {k5_ref}%" if k5_ref is not None else ""
+                    print(f"           vLLM accept rate: {s['vllm_accept_rate_pct_mean']:.1f}%"
+                          f"{ref_str} -- not asserted equal, check by eye")
     else:
         other = "speculative" if args.mode == "baseline" else "baseline"
         print(f"\n[*] Run --mode {other} next to complete the comparison.")
