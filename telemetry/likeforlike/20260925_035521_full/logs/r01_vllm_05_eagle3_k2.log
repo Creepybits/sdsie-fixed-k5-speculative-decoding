@@ -1,0 +1,305 @@
+/home/zanno/sdsie/.venv/bin/python /home/zanno/sdsie/repos/fixed-k5/benchmarks/likeforlike_worker.py --engine vllm --method eagle3 --rep 1 --prompt-offset 7 --tag eagle3_k2 --out /home/zanno/sdsie/repos/fixed-k5/telemetry/likeforlike/20260925_035521_full/runs/r01_vllm_05_eagle3_k2.json --tokens 250 --concurrency 1 --prefix-cache off --warmup-seconds 150.0 --prompt-set extended --k 2
+
+[*] vllm / eagle3 eagle3_k2 -- building engine...
+INFO 09-25 06:27:00 [api_utils.py:273] non-default args: {'dtype': 'bfloat16', 'max_model_len': 2048, 'enable_prefix_caching': False, 'gpu_memory_utilization': 0.85, 'speculative_config': {'method': 'eagle3', 'model': 'yuhuili/EAGLE3-LLaMA3.1-Instruct-8B', 'num_speculative_tokens': 2}, 'model': 'meta-llama/Llama-3.1-8B-Instruct'}
+INFO 09-25 06:27:01 [model.py:645] Resolved architecture: LlamaForCausalLM
+INFO 09-25 06:27:01 [model.py:1883] Using max model len 2048
+INFO 09-25 06:27:01 [model.py:645] Resolved architecture: LlamaForCausalLMEagle3
+WARNING 09-25 06:27:01 [model.py:2217] Casting torch.float16 to torch.bfloat16.
+INFO 09-25 06:27:01 [model.py:1883] Using max model len 2048
+INFO 09-25 06:27:01 [scheduler.py:242] Chunked prefill is enabled with max_num_batched_tokens=8192.
+INFO 09-25 06:27:01 [kernel.py:306] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+WARNING 09-25 06:27:04 [system_utils.py:157] We must use the `spawn` multiprocessing start method. Overriding VLLM_WORKER_MULTIPROC_METHOD to 'spawn'. See https://docs.vllm.ai/en/latest/usage/troubleshooting.html#python-multiprocessing for more information. Reasons: WSL is detected and NVML is not compatible with fork
+(EngineCore pid=119895) INFO 09-25 06:27:08 [core.py:121] Initializing a V1 LLM engine (v0.27.1) with config: model='meta-llama/Llama-3.1-8B-Instruct', speculative_config=SpeculativeConfig(method='eagle3', model='yuhuili/EAGLE3-LLaMA3.1-Instruct-8B', num_spec_tokens=2), tokenizer='meta-llama/Llama-3.1-8B-Instruct', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=2048, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=False, quantization=None, quantization_config=None, enforce_eager=False, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=meta-llama/Llama-3.1-8B-Instruct, enable_prefix_caching=False, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.VLLM_COMPILE: 3>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'inductor', 'custom_ops': ['none'], 'ir_enable_torch_wrap': True, 'splitting_ops': ['vllm::unified_attention_with_output', 'vllm::unified_mla_attention_with_output', 'vllm::mamba_mixer2', 'vllm::mamba_mixer', 'vllm::short_conv', 'vllm::linear_attention', 'vllm::qwen_gdn_attention_core', 'vllm::gdn_attention_core_xpu', 'vllm::olmo_hybrid_gdn_full_forward', 'vllm::sparse_attn_indexer', 'vllm::rocm_aiter_sparse_attn_indexer', 'vllm::deepseek_v4_attention', 'vllm::hpc_rope_norm_forward', 'vllm::unified_kv_cache_update', 'vllm::unified_mla_kv_cache_update'], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'compile_sizes': [], 'compile_ranges_endpoints': [8192], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.FULL_AND_PIECEWISE: (2, 1)>, 'cudagraph_num_of_warmups': 1, 'cudagraph_capture_sizes': [1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256, 272, 288, 304, 320, 336, 352, 368, 384, 400, 416, 432, 448, 464, 480, 496, 512], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': False, 'fuse_act_quant': False, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False, 'enable_qk_norm_rope_fusion': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False, 'fuse_qk_norm_rope_kvcache': False}, 'max_cudagraph_capture_size': 512, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': False, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native']), enable_flashinfer_autotune=True, enable_cutedsl_warmup=True, enable_jit_warmup=True, enable_bf16x3_router_gemm=False, moe_backend='auto', linear_backend='auto')
+(EngineCore pid=119895) INFO 09-25 06:27:08 [parallel_state.py:1640] world_size=1 rank=0 local_rank=0 distributed_init_method=tcp://172.27.62.101:48219 backend=nccl
+(EngineCore pid=119895) INFO 09-25 06:27:08 [parallel_state.py:1977] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank N/A, EPLB rank N/A
+(EngineCore pid=119895) INFO 09-25 06:27:08 [gpu_worker.py:385] Using V2 Model Runner
+(EngineCore pid=119895) INFO 09-25 06:27:09 [model_runner.py:308] Loading model from scratch...
+(EngineCore pid=119895) INFO 09-25 06:27:10 [cuda.py:482] Using FLASH_ATTN attention backend out of potential backends: ['FLASH_ATTN', 'FLASHINFER', 'TRITON_ATTN', 'FLEX_ATTENTION'].
+(EngineCore pid=119895) INFO 09-25 06:27:10 [flash_attn.py:789] Using FlashAttention version 2
+(EngineCore pid=119895) INFO 09-25 06:27:11 [weight_utils.py:867] Filesystem type for checkpoints: EXT4. Checkpoint size: 14.96 GiB. Available RAM: 43.11 GiB.
+(EngineCore pid=119895) INFO 09-25 06:27:11 [weight_utils.py:890] Auto-prefetch is disabled because the filesystem (EXT4) is not a recognized network FS (NFS/Lustre). If you want to force prefetching, start vLLM with --safetensors-load-strategy=prefetch.
+(EngineCore pid=119895) 
+Loading safetensors checkpoint shards:   0% Completed | 0/4 [00:00<?, ?it/s]
+(EngineCore pid=119895) 
+Loading safetensors checkpoint shards:  25% Completed | 1/4 [00:00<00:00,  3.31it/s]
+(EngineCore pid=119895) 
+Loading safetensors checkpoint shards:  50% Completed | 2/4 [00:00<00:00,  3.25it/s]
+(EngineCore pid=119895) 
+Loading safetensors checkpoint shards:  75% Completed | 3/4 [00:00<00:00,  3.27it/s]
+(EngineCore pid=119895) 
+Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:00<00:00,  4.05it/s]
+(EngineCore pid=119895) 
+(EngineCore pid=119895) INFO 09-25 06:27:12 [default_loader.py:430] Loading weights took 0.99 seconds
+(EngineCore pid=119895) INFO 09-25 06:27:12 [eagle3_utils.py:31] Using Eagle3 auxiliary layers from model: (2, 16, 29)
+(EngineCore pid=119895) 
+Loading pt checkpoint shards:   0% Completed | 0/1 [00:00<?, ?it/s]
+(EngineCore pid=119895) 
+Loading pt checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  2.80it/s]
+(EngineCore pid=119895) 
+Loading pt checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  2.80it/s]
+(EngineCore pid=119895) 
+(EngineCore pid=119895) INFO 09-25 06:27:13 [default_loader.py:430] Loading weights took 0.57 seconds
+(EngineCore pid=119895) INFO 09-25 06:27:13 [model_runner.py:329] Model loading took 15.8 GiB and 4.474165 seconds
+(EngineCore pid=119895) INFO 09-25 06:27:13 [topk_topp_sampler.py:46] FlashInfer top-p/top-k sampling disabled via VLLM_USE_FLASHINFER_SAMPLER=0.
+(EngineCore pid=119895) INFO 09-25 06:27:14 [caching.py:335] reconstructed serializable fn from standalone compile artifacts. num_artifacts=4 num_submods=33
+(EngineCore pid=119895) INFO 09-25 06:27:14 [decorators.py:311] Directly load AOT compilation from path /home/zanno/.cache/vllm/torch_compile_cache/torch_aot_compile/31b8f0e940354a2b0c9ea21c3d05915d6a6d965caea3bc5256be347f19ddee41/rank_0_0/model
+(EngineCore pid=119895) INFO 09-25 06:27:14 [monitor.py:53] torch.compile took 0.15 s in total
+(EngineCore pid=119895) INFO 09-25 06:27:14 [monitor.py:81] Initial profiling/warmup run took 0.14 s
+(EngineCore pid=119895) INFO 09-25 06:27:14 [caching.py:335] reconstructed serializable fn from standalone compile artifacts. num_artifacts=2 num_submods=2
+(EngineCore pid=119895) INFO 09-25 06:27:14 [decorators.py:311] Directly load AOT compilation from path /home/zanno/.cache/vllm/torch_compile_cache/torch_aot_compile/59ec86a067a3f8e5d0b2ece0e6a7d6444a29d0bd3d3ce86d382019a43b843eed/rank_0_0/model
+(EngineCore pid=119895) INFO 09-25 06:27:14 [monitor.py:53] torch.compile took 0.03 s in total
+(EngineCore pid=119895) INFO 09-25 06:27:14 [monitor.py:81] Initial profiling/warmup run took 0.00 s
+(EngineCore pid=119895) INFO 09-25 06:27:15 [gpu_worker.py:563] Available KV cache memory: 9.71 GiB
+(EngineCore pid=119895) INFO 09-25 06:27:15 [kv_cache_utils.py:2235] GPU KV cache size: 77,104 tokens
+(EngineCore pid=119895) INFO 09-25 06:27:15 [kv_cache_utils.py:2236] Maximum concurrency for 2,048 tokens per request: 37.65x
+(EngineCore pid=119895) INFO 09-25 06:27:15 [kernel_warmup.py:256] Using FlashInfer autotune cache file: /home/zanno/.cache/vllm/flashinfer_autotune_cache/0.6.16.post3/120f/f3abe1598136c685135376c16890c81f0ffd558746b7a32a2c5fde01b18de12d/autotune_configs.json
+(EngineCore pid=119895) 2026-09-25 06:27:15,615 - INFO - autotuner.py:2397 - flashinfer.jit: [Autotuner]: Loaded 0 configs from /home/zanno/.cache/vllm/flashinfer_autotune_cache/0.6.16.post3/120f/f3abe1598136c685135376c16890c81f0ffd558746b7a32a2c5fde01b18de12d/autotune_configs.json
+(EngineCore pid=119895) 2026-09-25 06:27:15,615 - INFO - autotuner.py:829 - flashinfer.jit: [Autotuner]: Autotuning process starts ...
+(EngineCore pid=119895) 2026-09-25 06:27:16,212 - INFO - autotuner.py:852 - flashinfer.jit: [Autotuner]: Autotuning process ends
+(EngineCore pid=119895) 2026-09-25 06:27:16,215 - INFO - autotuner.py:2269 - flashinfer.jit: [Autotuner]: Saved 0 configs to /home/zanno/.cache/vllm/flashinfer_autotune_cache/0.6.16.post3/120f/f3abe1598136c685135376c16890c81f0ffd558746b7a32a2c5fde01b18de12d/autotune_configs.json (0 new, 0 from previous config)
+(EngineCore pid=119895) 
+Capturing CUDA graphs (PIECEWISE):   0%|          | 0/51 [00:00<?, ?it/s]
+Capturing CUDA graphs (PIECEWISE):   4%|▍         | 2/51 [00:00<00:04, 12.11it/s]
+Capturing CUDA graphs (PIECEWISE):   8%|▊         | 4/51 [00:00<00:03, 12.32it/s]
+Capturing CUDA graphs (PIECEWISE):  12%|█▏        | 6/51 [00:00<00:03, 12.70it/s]
+Capturing CUDA graphs (PIECEWISE):  16%|█▌        | 8/51 [00:00<00:03, 12.89it/s]
+Capturing CUDA graphs (PIECEWISE):  20%|█▉        | 10/51 [00:00<00:03, 13.26it/s]
+Capturing CUDA graphs (PIECEWISE):  24%|██▎       | 12/51 [00:00<00:02, 13.48it/s]
+Capturing CUDA graphs (PIECEWISE):  27%|██▋       | 14/51 [00:01<00:02, 13.83it/s]
+Capturing CUDA graphs (PIECEWISE):  31%|███▏      | 16/51 [00:01<00:02, 14.10it/s]
+Capturing CUDA graphs (PIECEWISE):  35%|███▌      | 18/51 [00:01<00:02, 15.00it/s]
+Capturing CUDA graphs (PIECEWISE):  39%|███▉      | 20/51 [00:01<00:01, 15.69it/s]
+Capturing CUDA graphs (PIECEWISE):  43%|████▎     | 22/51 [00:01<00:01, 16.26it/s]
+Capturing CUDA graphs (PIECEWISE):  47%|████▋     | 24/51 [00:01<00:01, 16.54it/s]
+Capturing CUDA graphs (PIECEWISE):  51%|█████     | 26/51 [00:01<00:01, 17.44it/s]
+Capturing CUDA graphs (PIECEWISE):  55%|█████▍    | 28/51 [00:01<00:01, 18.05it/s]
+Capturing CUDA graphs (PIECEWISE):  61%|██████    | 31/51 [00:01<00:01, 18.78it/s]
+Capturing CUDA graphs (PIECEWISE):  65%|██████▍   | 33/51 [00:02<00:01, 17.03it/s]
+Capturing CUDA graphs (PIECEWISE):  69%|██████▊   | 35/51 [00:02<00:00, 17.60it/s]
+Capturing CUDA graphs (PIECEWISE):  73%|███████▎  | 37/51 [00:02<00:00, 18.20it/s]
+Capturing CUDA graphs (PIECEWISE):  76%|███████▋  | 39/51 [00:02<00:00, 18.68it/s]
+Capturing CUDA graphs (PIECEWISE):  80%|████████  | 41/51 [00:02<00:00, 18.96it/s]
+Capturing CUDA graphs (PIECEWISE):  86%|████████▋ | 44/51 [00:02<00:00, 19.47it/s]
+Capturing CUDA graphs (PIECEWISE):  92%|█████████▏| 47/51 [00:02<00:00, 19.81it/s]
+Capturing CUDA graphs (PIECEWISE):  98%|█████████▊| 50/51 [00:02<00:00, 20.23it/s]
+Capturing CUDA graphs (PIECEWISE): 100%|██████████| 51/51 [00:03<00:00, 16.68it/s]
+(EngineCore pid=119895) 
+Capturing CUDA graphs (FULL):   0%|          | 0/49 [00:00<?, ?it/s]
+Capturing CUDA graphs (FULL):   4%|▍         | 2/49 [00:00<00:02, 18.60it/s]
+Capturing CUDA graphs (FULL):   8%|▊         | 4/49 [00:00<00:02, 19.21it/s]
+Capturing CUDA graphs (FULL):  14%|█▍        | 7/49 [00:00<00:02, 20.42it/s]
+Capturing CUDA graphs (FULL):  20%|██        | 10/49 [00:00<00:01, 21.93it/s]
+Capturing CUDA graphs (FULL):  27%|██▋       | 13/49 [00:00<00:01, 23.13it/s]
+Capturing CUDA graphs (FULL):  33%|███▎      | 16/49 [00:00<00:01, 24.72it/s]
+Capturing CUDA graphs (FULL):  41%|████      | 20/49 [00:00<00:01, 26.85it/s]
+Capturing CUDA graphs (FULL):  49%|████▉     | 24/49 [00:00<00:00, 28.69it/s]
+Capturing CUDA graphs (FULL):  57%|█████▋    | 28/49 [00:01<00:00, 31.60it/s]
+Capturing CUDA graphs (FULL):  65%|██████▌   | 32/49 [00:01<00:00, 33.77it/s]
+Capturing CUDA graphs (FULL):  73%|███████▎  | 36/49 [00:01<00:00, 35.24it/s]
+Capturing CUDA graphs (FULL):  84%|████████▎ | 41/49 [00:01<00:00, 37.31it/s]
+Capturing CUDA graphs (FULL):  94%|█████████▍| 46/49 [00:01<00:00, 39.89it/s]
+Capturing CUDA graphs (FULL): 100%|██████████| 49/49 [00:01<00:00, 31.74it/s]
+(EngineCore pid=119895) INFO 09-25 06:27:21 [speculator.py:85] Capturing model for speculator...
+(EngineCore pid=119895) 
+Capturing prefill CUDA graphs (PIECEWISE):   0%|          | 0/51 [00:00<?, ?it/s]
+Capturing prefill CUDA graphs (PIECEWISE):  39%|███▉      | 20/51 [00:00<00:00, 194.33it/s]
+Capturing prefill CUDA graphs (PIECEWISE):  86%|████████▋ | 44/51 [00:00<00:00, 217.50it/s]
+Capturing prefill CUDA graphs (PIECEWISE): 100%|██████████| 51/51 [00:00<00:00, 227.24it/s]
+(EngineCore pid=119895) 
+Capturing prefill CUDA graphs (FULL):   0%|          | 0/49 [00:00<?, ?it/s]
+Capturing prefill CUDA graphs (FULL):  45%|████▍     | 22/49 [00:00<00:00, 210.02it/s]
+Capturing prefill CUDA graphs (FULL): 100%|██████████| 49/49 [00:00<00:00, 241.97it/s]
+Capturing prefill CUDA graphs (FULL): 100%|██████████| 49/49 [00:00<00:00, 236.99it/s]
+(EngineCore pid=119895) 
+Capturing decode CUDA graphs (FULL):   0%|          | 0/35 [00:00<?, ?it/s]
+Capturing decode CUDA graphs (FULL):  60%|██████    | 21/35 [00:00<00:00, 209.40it/s]
+Capturing decode CUDA graphs (FULL): 100%|██████████| 35/35 [00:00<00:00, 158.78it/s]
+(EngineCore pid=119895) INFO 09-25 06:27:21 [model_runner.py:791] Graph capturing finished in 5 secs, took 0.78 GiB
+(EngineCore pid=119895) INFO 09-25 06:27:21 [gpu_worker.py:789] Free memory on device (30.2/31.82 GiB) on startup. Desired GPU memory utilization is (0.85, 27.04 GiB). Actual usage is 16.24 GiB for consumed memory (weights + non-torch), 1.09 GiB for peak activation, and 0.78 GiB for CUDAGraph memory. Replace gpu_memory_utilization config with `--kv-cache-memory=9425139610` (8.78 GiB) to fit into requested memory, or `--kv-cache-memory=12816735744` (11.94 GiB) to fully utilize gpu memory. Current kv cache memory in use is 9.71 GiB.
+(EngineCore pid=119895) INFO 09-25 06:27:22 [jit_monitor.py:79] Kernel JIT monitor activated; monitored JIT compilations during inference will use mode=warn.
+(EngineCore pid=119895) INFO 09-25 06:27:22 [core.py:348] init engine (profile, create kv cache, warmup model) took 9.45 s (compilation: 0.18 s)
+(EngineCore pid=119895) INFO 09-25 06:27:24 [kernel.py:306] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+INFO 09-25 06:27:26 [hf.py:540] Detected the chat template content format to be 'string'. You can set `--chat-template-content-format` to override this.
+(EngineCore pid=119895) WARNING 09-25 06:27:26 [jit_monitor.py:135] Triton kernel JIT compilation during inference: _compute_local_logits_stats_kernel. This causes a latency spike; consider extending warmup to cover this shape/config.
+(EngineCore pid=119895) WARNING 09-25 06:27:26 [jit_monitor.py:135] Triton kernel JIT compilation during inference: _rejection_kernel. This causes a latency spike; consider extending warmup to cover this shape/config.
+(EngineCore pid=119895) WARNING 09-25 06:27:26 [jit_monitor.py:135] Triton kernel JIT compilation during inference: _resample_kernel. This causes a latency spike; consider extending warmup to cover this shape/config.
+
+###############################################################################################
+# CLOSED-LOOP THERMAL WARMUP (discarded, not recorded)
+# per label, over its own last 6 readings, newer-half mean vs older-half mean:
+#   power drift <= 1.50% of that label's mean draw
+#   temp  drift <= 1.0 C
+# floor: 150 s   cap: 450 s
+###############################################################################################
+  warmup   1  warm0         t=   1.7s  P= 233.34 W  T=54 C
+  warmup   2  warm1         t=   3.3s  P= 383.53 W  T=54 C
+  warmup   3  warm2         t=   4.7s  P= 384.43 W  T=54 C
+  warmup   4  warm0         t=   6.4s  P= 385.24 W  T=55 C
+  warmup   5  warm1         t=   8.1s  P= 385.80 W  T=55 C
+  warmup   6  warm2         t=   9.5s  P= 385.81 W  T=55 C
+INFO 09-25 06:27:36 [loggers.py:310] Engine 000: Avg prompt throughput: 30.5 tokens/s, Avg generation throughput: 133.2 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.2%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:27:36 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.95, Accepted throughput: 64.80 tokens/s, Drafted throughput: 136.37 tokens/s, Accepted: 785 tokens, Drafted: 1652 tokens, Per-position acceptance rate: 0.592, 0.358, Avg Draft acceptance rate: 47.5%
+  warmup   7  warm0         t=  11.1s  P= 386.11 W  T=55 C
+  warmup   8  warm1         t=  12.6s  P= 386.86 W  T=56 C
+  warmup   9  warm2         t=  14.1s  P= 386.76 W  T=56 C
+  warmup  10  warm0         t=  15.7s  P= 387.19 W  T=56 C
+  warmup  11  warm1         t=  17.3s  P= 387.72 W  T=56 C
+  warmup  12  warm2         t=  18.7s  P= 387.61 W  T=57 C
+INFO 09-25 06:27:46 [loggers.py:310] Engine 000: Avg prompt throughput: 31.2 tokens/s, Avg generation throughput: 162.5 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.4%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:27:46 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.93, Accepted throughput: 78.19 tokens/s, Drafted throughput: 168.18 tokens/s, Accepted: 782 tokens, Drafted: 1682 tokens, Per-position acceptance rate: 0.585, 0.345, Avg Draft acceptance rate: 46.5%
+  warmup  13  warm0         t=  20.2s  P= 388.35 W  T=57 C
+  warmup  14  warm1         t=  21.8s  P= 388.47 W  T=57 C
+  warmup  15  warm2         t=  23.2s  P= 388.53 W  T=57 C
+  warmup  16  warm0         t=  24.8s  P= 389.14 W  T=57 C
+  warmup  17  warm1         t=  26.4s  P= 389.79 W  T=58 C
+  warmup  18  warm2         t=  27.8s  P= 388.90 W  T=58 C
+  warmup  19  warm0         t=  29.4s  P= 390.19 W  T=58 C
+INFO 09-25 06:27:56 [loggers.py:310] Engine 000: Avg prompt throughput: 33.8 tokens/s, Avg generation throughput: 162.7 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.4%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:27:56 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.94, Accepted throughput: 78.65 tokens/s, Drafted throughput: 167.76 tokens/s, Accepted: 842 tokens, Drafted: 1796 tokens, Per-position acceptance rate: 0.586, 0.352, Avg Draft acceptance rate: 46.9%
+  warmup  20  warm1         t=  31.0s  P= 391.14 W  T=58 C
+  warmup  21  warm2         t=  32.4s  P= 390.87 W  T=58 C
+  warmup  22  warm0         t=  34.0s  P= 391.03 W  T=59 C
+  warmup  23  warm1         t=  35.6s  P= 391.62 W  T=59 C
+  warmup  24  warm2         t=  37.0s  P= 391.88 W  T=59 C
+  warmup  25  warm0         t=  38.6s  P= 392.46 W  T=59 C
+  warmup  26  warm1         t=  40.2s  P= 393.45 W  T=59 C
+INFO 09-25 06:28:06 [loggers.py:310] Engine 000: Avg prompt throughput: 36.1 tokens/s, Avg generation throughput: 162.8 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.2%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:28:06 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.94, Accepted throughput: 78.60 tokens/s, Drafted throughput: 167.79 tokens/s, Accepted: 786 tokens, Drafted: 1678 tokens, Per-position acceptance rate: 0.584, 0.353, Avg Draft acceptance rate: 46.8%
+  warmup  27  warm2         t=  41.6s  P= 393.19 W  T=59 C
+  warmup  28  warm0         t=  43.2s  P= 393.29 W  T=60 C
+  warmup  29  warm1         t=  44.8s  P= 393.39 W  T=60 C
+  warmup  30  warm2         t=  46.3s  P= 392.85 W  T=60 C
+  warmup  31  warm0         t=  48.0s  P= 393.34 W  T=60 C
+  warmup  32  warm1         t=  49.5s  P= 393.84 W  T=60 C
+INFO 09-25 06:28:16 [loggers.py:310] Engine 000: Avg prompt throughput: 31.2 tokens/s, Avg generation throughput: 163.5 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.4%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:28:16 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.97, Accepted throughput: 80.47 tokens/s, Drafted throughput: 165.74 tokens/s, Accepted: 805 tokens, Drafted: 1658 tokens, Per-position acceptance rate: 0.601, 0.370, Avg Draft acceptance rate: 48.6%
+  warmup  33  warm2         t=  50.9s  P= 394.20 W  T=60 C
+  warmup  34  warm0         t=  52.5s  P= 394.64 W  T=60 C
+  warmup  35  warm1         t=  54.1s  P= 394.62 W  T=60 C
+  warmup  36  warm2         t=  55.5s  P= 394.31 W  T=60 C
+  warmup  37  warm0         t=  57.1s  P= 394.63 W  T=60 C
+  warmup  38  warm1         t=  58.6s  P= 394.77 W  T=60 C
+  warmup  39  warm2         t=  60.0s  P= 394.79 W  T=60 C
+INFO 09-25 06:28:26 [loggers.py:310] Engine 000: Avg prompt throughput: 36.9 tokens/s, Avg generation throughput: 164.8 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.3%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:28:26 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.95, Accepted throughput: 80.36 tokens/s, Drafted throughput: 168.51 tokens/s, Accepted: 804 tokens, Drafted: 1686 tokens, Per-position acceptance rate: 0.594, 0.359, Avg Draft acceptance rate: 47.7%
+  warmup  40  warm0         t=  61.6s  P= 395.74 W  T=60 C
+  warmup  41  warm1         t=  63.2s  P= 395.63 W  T=61 C
+  warmup  42  warm2         t=  64.6s  P= 394.62 W  T=61 C
+  warmup  43  warm0         t=  66.2s  P= 395.93 W  T=61 C
+  warmup  44  warm1         t=  67.8s  P= 396.37 W  T=61 C
+  warmup  45  warm2         t=  69.2s  P= 395.74 W  T=61 C
+  warmup  46  warm0         t=  70.9s  P= 396.12 W  T=61 C
+INFO 09-25 06:28:36 [loggers.py:310] Engine 000: Avg prompt throughput: 34.0 tokens/s, Avg generation throughput: 160.5 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.2%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:28:36 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.93, Accepted throughput: 77.25 tokens/s, Drafted throughput: 166.13 tokens/s, Accepted: 823 tokens, Drafted: 1770 tokens, Per-position acceptance rate: 0.584, 0.346, Avg Draft acceptance rate: 46.5%
+  warmup  47  warm1         t=  72.5s  P= 396.66 W  T=61 C
+  warmup  48  warm2         t=  74.0s  P= 395.55 W  T=61 C
+  warmup  49  warm0         t=  75.5s  P= 395.61 W  T=61 C
+  warmup  50  warm1         t=  77.1s  P= 396.34 W  T=61 C
+  warmup  51  warm2         t=  78.5s  P= 395.13 W  T=61 C
+  warmup  52  warm0         t=  80.1s  P= 395.42 W  T=61 C
+INFO 09-25 06:28:46 [loggers.py:310] Engine 000: Avg prompt throughput: 31.2 tokens/s, Avg generation throughput: 161.3 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.4%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:28:46 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.94, Accepted throughput: 78.03 tokens/s, Drafted throughput: 166.24 tokens/s, Accepted: 781 tokens, Drafted: 1664 tokens, Per-position acceptance rate: 0.587, 0.352, Avg Draft acceptance rate: 46.9%
+  warmup  53  warm1         t=  81.8s  P= 395.93 W  T=61 C
+  warmup  54  warm2         t=  83.1s  P= 395.33 W  T=61 C
+  warmup  55  warm0         t=  84.7s  P= 395.44 W  T=61 C
+  warmup  56  warm1         t=  86.3s  P= 395.36 W  T=61 C
+  warmup  57  warm2         t=  87.7s  P= 395.05 W  T=61 C
+  warmup  58  warm0         t=  89.3s  P= 395.83 W  T=61 C
+  warmup  59  warm1         t=  90.9s  P= 395.84 W  T=61 C
+INFO 09-25 06:28:56 [loggers.py:310] Engine 000: Avg prompt throughput: 36.1 tokens/s, Avg generation throughput: 163.6 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.2%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:28:56 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.94, Accepted throughput: 78.96 tokens/s, Drafted throughput: 168.72 tokens/s, Accepted: 790 tokens, Drafted: 1688 tokens, Per-position acceptance rate: 0.583, 0.353, Avg Draft acceptance rate: 46.8%
+  warmup  60  warm2         t=  92.3s  P= 395.44 W  T=61 C
+  warmup  61  warm0         t=  93.9s  P= 396.38 W  T=61 C
+  warmup  62  warm1         t=  95.4s  P= 395.72 W  T=61 C
+  warmup  63  warm2         t=  96.9s  P= 394.59 W  T=61 C
+  warmup  64  warm0         t=  98.4s  P= 395.22 W  T=61 C
+  warmup  65  warm1         t= 100.0s  P= 395.73 W  T=61 C
+  warmup  66  warm2         t= 101.4s  P= 394.84 W  T=61 C
+INFO 09-25 06:29:06 [loggers.py:310] Engine 000: Avg prompt throughput: 34.5 tokens/s, Avg generation throughput: 166.6 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.3%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:29:06 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.97, Accepted throughput: 82.11 tokens/s, Drafted throughput: 168.52 tokens/s, Accepted: 878 tokens, Drafted: 1802 tokens, Per-position acceptance rate: 0.603, 0.372, Avg Draft acceptance rate: 48.7%
+  warmup  67  warm0         t= 103.0s  P= 395.64 W  T=61 C
+  warmup  68  warm1         t= 104.7s  P= 395.87 W  T=61 C
+  warmup  69  warm2         t= 106.1s  P= 395.10 W  T=61 C
+  warmup  70  warm0         t= 107.7s  P= 395.38 W  T=61 C
+  warmup  71  warm1         t= 109.2s  P= 395.24 W  T=61 C
+  warmup  72  warm2         t= 110.7s  P= 394.59 W  T=61 C
+INFO 09-25 06:29:16 [loggers.py:310] Engine 000: Avg prompt throughput: 31.2 tokens/s, Avg generation throughput: 160.2 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.4%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:29:16 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.93, Accepted throughput: 77.07 tokens/s, Drafted throughput: 165.93 tokens/s, Accepted: 771 tokens, Drafted: 1660 tokens, Per-position acceptance rate: 0.584, 0.345, Avg Draft acceptance rate: 46.4%
+  warmup  73  warm0         t= 112.3s  P= 394.94 W  T=60 C
+  warmup  74  warm1         t= 113.9s  P= 395.42 W  T=60 C
+  warmup  75  warm2         t= 115.3s  P= 394.83 W  T=60 C
+  warmup  76  warm0         t= 116.9s  P= 395.11 W  T=60 C
+  warmup  77  warm1         t= 118.5s  P= 395.07 W  T=60 C
+  warmup  78  warm2         t= 119.9s  P= 394.55 W  T=60 C
+  warmup  79  warm0         t= 121.5s  P= 395.42 W  T=60 C
+INFO 09-25 06:29:26 [loggers.py:310] Engine 000: Avg prompt throughput: 36.2 tokens/s, Avg generation throughput: 162.6 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.2%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:29:26 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.94, Accepted throughput: 78.87 tokens/s, Drafted throughput: 167.13 tokens/s, Accepted: 789 tokens, Drafted: 1672 tokens, Per-position acceptance rate: 0.589, 0.355, Avg Draft acceptance rate: 47.2%
+  warmup  80  warm1         t= 123.1s  P= 395.54 W  T=60 C
+  warmup  81  warm2         t= 124.5s  P= 394.86 W  T=60 C
+  warmup  82  warm0         t= 126.0s  P= 395.84 W  T=60 C
+  warmup  83  warm1         t= 127.6s  P= 395.36 W  T=60 C
+  warmup  84  warm2         t= 129.0s  P= 394.69 W  T=60 C
+  warmup  85  warm0         t= 130.6s  P= 395.49 W  T=60 C
+  warmup  86  warm1         t= 132.2s  P= 395.61 W  T=60 C
+INFO 09-25 06:29:36 [loggers.py:310] Engine 000: Avg prompt throughput: 34.0 tokens/s, Avg generation throughput: 163.6 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.2%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:29:36 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.93, Accepted throughput: 78.85 tokens/s, Drafted throughput: 168.98 tokens/s, Accepted: 838 tokens, Drafted: 1796 tokens, Per-position acceptance rate: 0.582, 0.351, Avg Draft acceptance rate: 46.7%
+  warmup  87  warm2         t= 133.6s  P= 394.29 W  T=60 C
+  warmup  88  warm0         t= 135.2s  P= 395.41 W  T=60 C
+  warmup  89  warm1         t= 136.9s  P= 395.46 W  T=60 C
+  warmup  90  warm2         t= 138.3s  P= 394.72 W  T=60 C
+  warmup  91  warm0         t= 139.9s  P= 395.47 W  T=60 C
+  warmup  92  warm1         t= 141.5s  P= 395.22 W  T=60 C
+  warmup  93  warm2         t= 142.9s  P= 393.91 W  T=60 C
+INFO 09-25 06:29:46 [loggers.py:310] Engine 000: Avg prompt throughput: 36.9 tokens/s, Avg generation throughput: 164.5 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.1%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:29:46 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.97, Accepted throughput: 80.99 tokens/s, Drafted throughput: 166.57 tokens/s, Accepted: 810 tokens, Drafted: 1666 tokens, Per-position acceptance rate: 0.601, 0.371, Avg Draft acceptance rate: 48.6%
+  warmup  94  warm0         t= 144.5s  P= 394.60 W  T=60 C
+  warmup  95  warm1         t= 146.1s  P= 395.14 W  T=60 C
+  warmup  96  warm2         t= 147.5s  P= 394.62 W  T=60 C
+  warmup  97  warm0         t= 149.1s  P= 394.95 W  T=60 C
+  warmup  98  warm1         t= 150.7s  P= 394.89 W  T=60 C
+[*] Steady state reached after 150.7 s (98 warmup iterations).
+    Per-label power drift: warm0=0.57W, warm1=0.39W, warm2=0.19W
+    Per-label temp  drift: warm0=0.00C, warm1=0.00C, warm2=0.00C
+    meta keys of first request: None
+  [  1/27] roleplay_2                               134.4 tok/s  J/tok=2.843951999999583  accept_len=1.62 (counter_delta)
+INFO 09-25 06:29:56 [loggers.py:310] Engine 000: Avg prompt throughput: 43.9 tokens/s, Avg generation throughput: 154.5 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.1%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:29:56 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.86, Accepted throughput: 71.07 tokens/s, Drafted throughput: 165.93 tokens/s, Accepted: 711 tokens, Drafted: 1660 tokens, Per-position acceptance rate: 0.553, 0.304, Avg Draft acceptance rate: 42.8%
+  [  2/27] roleplay_3                               174.4 tok/s  J/tok=2.058519999999553  accept_len=2.13 (counter_delta)
+  [  3/27] reasoning_1                              159.8 tok/s  J/tok=2.5079227272717453  accept_len=1.89 (counter_delta)
+  [  4/27] reasoning_2                              166.8 tok/s  J/tok=2.4072452830194653  accept_len=1.96 (counter_delta)
+  [  5/27] reasoning_3                              176.6 tok/s  J/tok=2.138539215686786  accept_len=2.08 (counter_delta)
+  [  6/27] math_1                                   173.6 tok/s  J/tok=2.214444000001997  accept_len=2.04 (counter_delta)
+  [  7/27] math_2                                   160.9 tok/s  J/tok=2.3577719999998807  accept_len=1.92 (counter_delta)
+  [  8/27] math_3                                   170.1 tok/s  J/tok=2.1998280000016095  accept_len=2.03 (counter_delta)
+INFO 09-25 06:30:06 [loggers.py:310] Engine 000: Avg prompt throughput: 77.6 tokens/s, Avg generation throughput: 168.0 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.3%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:30:06 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 2.02, Accepted throughput: 84.33 tokens/s, Drafted throughput: 165.65 tokens/s, Accepted: 898 tokens, Drafted: 1764 tokens, Per-position acceptance rate: 0.629, 0.389, Avg Draft acceptance rate: 50.9%
+  [  9/27] coding_1                                 188.0 tok/s  J/tok=2.039172000002116  accept_len=2.24 (counter_delta)
+  [ 10/27] coding_2                                 179.2 tok/s  J/tok=2.2082400000020863  accept_len=2.12 (counter_delta)
+  [ 11/27] coding_3                                 183.6 tok/s  J/tok=2.1992760000005362  accept_len=2.15 (counter_delta)
+  [ 12/27] extraction_1                             183.2 tok/s  J/tok=1.975690000001341  accept_len=2.33 (counter_delta)
+  [ 13/27] extraction_2                             147.1 tok/s  J/tok=2.9358867924519867  accept_len=1.93 (counter_delta)
+  [ 14/27] extraction_3                             170.1 tok/s  J/tok=2.155109090899879  accept_len=2.29 (counter_delta)
+  [ 15/27] stem_1                                   156.2 tok/s  J/tok=2.3615480000004174  accept_len=1.96 (counter_delta)
+  [ 16/27] stem_2                                   169.2 tok/s  J/tok=2.198812000002712  accept_len=1.98 (counter_delta)
+  [ 17/27] stem_3                                   176.3 tok/s  J/tok=2.207179999999702  accept_len=2.07 (counter_delta)
+INFO 09-25 06:30:16 [loggers.py:310] Engine 000: Avg prompt throughput: 110.3 tokens/s, Avg generation throughput: 168.9 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.1%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:30:16 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 2.07, Accepted throughput: 86.71 tokens/s, Drafted throughput: 161.82 tokens/s, Accepted: 868 tokens, Drafted: 1620 tokens, Per-position acceptance rate: 0.635, 0.437, Avg Draft acceptance rate: 53.6%
+  [ 18/27] humanities_1                             151.4 tok/s  J/tok=2.6721440000012517  accept_len=1.77 (counter_delta)
+  [ 19/27] humanities_2                             158.1 tok/s  J/tok=2.363539999999106  accept_len=1.95 (counter_delta)
+  [ 20/27] humanities_3                             169.9 tok/s  J/tok=2.0521359999999405  accept_len=2.14 (counter_delta)
+  [ 21/27] ref_poem                                 144.5 tok/s  J/tok=2.8258839999996126  accept_len=1.68 (counter_delta)
+  [ 22/27] ref_physics                              166.7 tok/s  J/tok=2.3387400000020864  accept_len=1.95 (counter_delta)
+  [ 23/27] ref_code                                 210.5 tok/s  J/tok=1.8808680000007152  accept_len=2.49 (counter_delta)
+INFO 09-25 06:30:26 [loggers.py:310] Engine 000: Avg prompt throughput: 62.8 tokens/s, Avg generation throughput: 162.0 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.2%, Prefix cache hit rate: 0.0%
+INFO 09-25 06:30:26 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 1.95, Accepted throughput: 78.62 tokens/s, Drafted throughput: 165.23 tokens/s, Accepted: 787 tokens, Drafted: 1654 tokens, Per-position acceptance rate: 0.602, 0.349, Avg Draft acceptance rate: 47.6%
+  [ 24/27] writing_1                                139.6 tok/s  J/tok=2.8248880000002683  accept_len=1.67 (counter_delta)
+  [ 25/27] writing_2                                153.4 tok/s  J/tok=2.51253200000152  accept_len=1.87 (counter_delta)
+  [ 26/27] writing_3                                157.6 tok/s  J/tok=2.350327999997884  accept_len=1.87 (counter_delta)
+  [ 27/27] roleplay_1                               138.7 tok/s  J/tok=2.8291480000019074  accept_len=1.62 (counter_delta)
+[*] Wrote /home/zanno/sdsie/repos/fixed-k5/telemetry/likeforlike/20260925_035521_full/runs/r01_vllm_05_eagle3_k2.json (status=ok)
+INFO 09-25 06:30:32 [utils.py:612] [shutdown] Process manager: send sigterm to process EngineCore
+(EngineCore pid=119895) INFO 09-25 06:30:32 [core.py:1332] [shutdown] EngineCore: trigger received signal=SIGTERM
+(EngineCore pid=119895) INFO 09-25 06:30:32 [core.py:1468] [shutdown] EngineCore: start mode=abort timeout=0s
+(EngineCore pid=119895) INFO 09-25 06:30:32 [core.py:1499] [shutdown] EngineCore: request processing complete; starting resource teardown
+(EngineCore pid=119895) INFO 09-25 06:30:32 [core.py:1345] [shutdown] EngineCore: exiting busy loop
