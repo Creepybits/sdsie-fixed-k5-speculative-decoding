@@ -1,6 +1,6 @@
 {
-  "title": "SDSIE: Fixed K=5 Speculative Decoding",
-  "description": "Open-source (Apache-2.0) GPU inference layer exploring energy-proportional LLM serving via fixed K=5 speculative decoding clutch. Each core component is independently validated with real, reproducible telemetry; see the repository README for current validation status and the corrections table.",
+  "title": "Fixed-K Speculative Decoding vs. EAGLE-3: A Like-for-Like, Energy-Measured Comparison in vLLM and SGLang",
+  "description": "Benchmark code, raw telemetry and paper for a like-for-like comparison of fixed-window draft-model speculative decoding (Llama-3.2-1B drafting K=5 tokens for Llama-3.1-8B) against EAGLE-3, EAGLE-1 and n-gram drafting inside vLLM and SGLang, with GPU energy per token read from the hardware energy counter. At batch size 1 on an RTX 5090, the draft-model configuration raises throughput by 60-79% and roughly halves energy per token compared with non-speculative decoding; a well-configured EAGLE-3 is 8-14% faster, with energy per token within about 10% either way. This is not a new algorithm: the contribution is the measurement protocol and results. See the README for scope and limitations.",
   "creators": [
     {
       "name": "Jacklin, Zanno",
@@ -12,41 +12,27 @@
   "license": "Apache-2.0",
   "upload_type": "software",
   "keywords": [
-    "NVIDIA",
-    "Blackwell",
-    "Triton",
-    "GPU Kernels",
-    "SRAM Dequantization",
-    "Memory Wall",
-    "Sub-Byte GEMM",
+    "Speculative Decoding",
+    "EAGLE-3",
+    "Draft Model",
+    "vLLM",
+    "SGLang",
+    "Benchmarking",
+    "GPU Energy Measurement",
+    "NVML Power Profiling",
+    "Energy-Efficient AI",
+    "Green AI",
+    "Green Computing",
     "Large Language Models",
     "LLM",
-    "Dynamic Quantization",
-    "Speculative Decoding",
-    "Speculative Verification",
-    "Shannon Entropy",
-    "Schmitt Trigger Hysteresis",
-    "Energy-Efficient AI",
-    "Green Computing",
-    "NVML Power Profiling",
-    "Green AI"
+    "NVIDIA",
+    "Blackwell"
   ],
   "related_identifiers": [
     {
       "identifier": "https://sdsie.github.io/",
       "relation": "isDescribedBy",
       "resource_type": "publication-technicalnote",
-      "scheme": "url"
-    },
-    {
-      "identifier": "https://github.com/Creepybits/sdsie-fixed-k5-speculative-decoding",
-      "relation": "isSupplementTo",
-      "resource_type": "software",
-      "scheme": "url"
-    },
-    {
-      "identifier": "https://zanno.se",
-      "relation": "isIdenticalTo",
       "scheme": "url"
     }
   ],
