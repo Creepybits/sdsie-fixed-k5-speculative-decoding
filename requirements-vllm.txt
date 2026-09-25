@@ -15,7 +15,7 @@
 # (a CUDA 13.2 build). If pip picks a different CUDA build for your system, see
 # vLLM's own installation instructions for selecting one.
 
-vllm==0.27.1
+vllm==0.28.0
 transformers==5.15.1
 numpy==2.3.5
 nvidia-ml-py==13.610.43   # provides the `pynvml` module used for power/energy readings
