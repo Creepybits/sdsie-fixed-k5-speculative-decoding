@@ -1,4 +1,19 @@
-torch>=2.13
-transformers>=4.40
-pynvml
+# Cache-free harness -- benchmarks/benchmark_ablation.py, speculative_scout.py,
+# benchmark_cached_ablation.py (plain PyTorch + Hugging Face Transformers, no
+# serving engine).
+#
+# IMPORTANT: the exact package versions behind the published cache-free table
+# (the 2026-09-05 run, telemetry/ablation_results.json) were NOT recorded.
+# The lower bounds below are what these scripts have since been run with
+# (torch 2.10 / transformers 5.17 in the project's .k5venv); they are minimums,
+# not a reproduction of the 2026-09-05 environment.
+#
+# For the like-for-like engine comparison, use requirements-vllm.txt and
+# requirements-sglang.txt instead (two separate environments).
+
+torch>=2.10
+transformers>=5.12       # the scripts use the `dtype=` loading argument of Transformers 5.x
+accelerate               # used by Transformers when models are loaded with device_map
 numpy
+nvidia-ml-py             # provides the `pynvml` module used for power/energy readings
+matplotlib               # only needed for the plot_*.py scripts

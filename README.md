@@ -1,257 +1,299 @@
-# Fixed-K Speculative Decoding: Real, Reproducible Energy & Speed Gains  
+# Fixed-K Speculative Decoding vs. EAGLE-3: A Like-for-Like, Energy-Measured Comparison
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22210487.svg)](https://doi.org/10.5281/zenodo.22210487)
-[![Hardware](https://img.shields.io/badge/Verified%20On-NVIDIA%20RTX%205090%20Blackwell-10b981.svg)](https://sdsie.github.io/)
-[![Live Portal](https://img.shields.io/badge/Interactive%20Portal-sdsie.github.io-a855f7.svg)](https://sdsie.github.io/)  
+[![Hardware](https://img.shields.io/badge/Measured%20On-NVIDIA%20RTX%205090%20Blackwell-10b981.svg)](https://sdsie.github.io/)
+[![Live Portal](https://img.shields.io/badge/Interactive%20Portal-sdsie.github.io-a855f7.svg)](https://sdsie.github.io/)
 
-Real scout(1B)→target(8B) speculative decoding with a lossless verify/rollback loop,
-fixed draft window K=5. **Every number below is real, independently reproduced, and
-traceable to a script in this repo.** This is the fully validated, production-ready
-result from the SDSIE research line — recommended for evaluation or deployment today.
-___
-Historical note: this repo originated as an extraction from the broader
-[SDSIE](https://github.com/Creepybits/software-defined-stochastic-inference-engine)
-research project. SDSIE also explores more ambitious entropy-gated *dynamic* speculation
-and INT4 quantization-switching mechanisms; both have since been tested for real and, so
-far, found not to improve on this simpler, fixed approach — see
-[Relationship to SDSIE](#relationship-to-sdsie) below for the full, honest account.
-___
+**K5** is draft-model speculative decoding with a fixed draft window: a small model
+(Llama-3.2-1B-Instruct) proposes K=5 tokens, the target model (Llama-3.1-8B-Instruct)
+verifies them in one pass and keeps the longest prefix it agrees with.
 
-## Results (N=10 trials/prompt, RTX 5090 Blackwell, 100% output fidelity on all rows)
+This is **not a new algorithm**. It is the classic method of Leviathan et al. and Chen
+et al. (2023), and it already ships as `draft_model` in vLLM, `STANDALONE` in SGLang and
+assisted generation in Hugging Face Transformers. What this repo contributes is
+**careful measurement**: a like-for-like benchmark of this configuration against EAGLE-3,
+EAGLE-1 and n-gram drafting inside two production engines, with GPU energy per token
+measured from the hardware energy counter.
 
-*Updated 2026-09-05. Supersedes the numbers previously reported here — a further warmup
-convergence fix (see [Methodology](#methodology) below) let the closed-loop warmup reach
-genuine steady state for the first time (previous runs hit their time cap without
-converging); every figure below is a fresh, re-measured number from a run with the
-cleanest drift diagnostics of the project to date.*
+## Key findings (batch size 1, RTX 5090, 27 prompts, 2 repetitions)
 
-| Prompt | Baseline tok/s | Speculative tok/s | Speedup | Baseline J/tok | Speculative J/tok | Energy Δ | Accept % |
-|---|---|---|---|---|---|---|---|
-| Poem | 40.16 ± 0.28 | 43.55 ± 0.31 | +8.4% | 11.44 ± 0.09 | 7.70 ± 0.06 | −32.7% | 42.5% |
-| Physics | 40.05 ± 0.18 | 49.64 ± 0.43 | +24.0% | 11.49 ± 0.06 | 6.99 ± 0.06 | −39.2% | 51.7% |
-| Code | 40.04 ± 0.23 | **73.46 ± 0.74** | **+83.5%** | 11.54 ± 0.05 | **4.53 ± 0.04** | **−60.8%** | **85.4%** |
+| | SGLang 0.5.20 | vLLM 0.27.1 |
+|---|---|---|
+| K5 throughput vs. no speculation | **+79%** | **+60%** |
+| K5 energy per token vs. no speculation | **−55%** | **−53%** |
+| Best EAGLE-3 throughput vs. no speculation | +108% (tree config) | +74% |
+| **K5 speed vs. best EAGLE-3** | **−13.6%** [−19.0, −8.5] | **−8.2%** [−14.5, −1.5] |
+| **K5 energy per token vs. best EAGLE-3** | **+10.2%** (more) | **−9.1%** (less) |
 
-![Throughput: FP16 baseline vs. speculative (K=5), per prompt](assets/throughput_baseline_vs_speculative.png)
-![Energy per token: FP16 baseline vs. speculative (K=5), per prompt](assets/energy_per_token_baseline_vs_speculative.png)
+*Evaluation prompts only (13 of 27; see [the protocol](#how-the-comparison-is-kept-fair)).
+Brackets are 95% ranges.*
 
-Speedup and energy reduction scale with draft-acceptance rate — higher on predictable
-content (code), lower but still real on less predictable content (free-form prose).
+In plain terms:
 
-![Speedup vs. FP16 baseline as a function of draft accept rate](assets/speedup_vs_accept_rate.png)
+- **K5 roughly halves GPU energy per token** and raises throughput by 60–79%, in both
+  engines.
+- **A well-configured EAGLE-3 is faster** than K5 in both engines, by 8–14%. On energy
+  per token it's a split decision: K5 uses less in vLLM and more in SGLang.
+- **K5 reaches about 74–81% of EAGLE-3's speed gain without needing a trained EAGLE
+  head.** EAGLE-3 only works where someone has trained a draft head for your exact
+  target model. A draft model works with any small model from the same family, which
+  makes it the practical option for fine-tuned, custom or newly released models.
+- **K=5 is the right window.** No other window tested was measurably better.
+- **K5 beats n-gram drafting by ~66–71%** in speed, and ties EAGLE-1 in vLLM.
 
-Accept rates have been independently cross-validated across every run of this ablation,
-including across a full rewrite of the measurement harness, and consistently match to
-within a few hundredths of a percentage point (deterministic greedy decoding) — strong
-evidence the accept/reject logic itself is correct and stable, independent of the
-measurement-methodology fixes described below. This run's accept rates (42.5% / 51.7% /
-85.4%) also match `speculative_scout.py`'s independent single-run figures exactly, and
-its throughput/energy numbers land within a few percent of that script's own
-independently-measured values — two different scripts, same underlying `bench_common.py`,
-agreeing with each other rather than just being internally consistent with themselves.
-Mean GPU power during speculative runs (346–364 W) is lower than during the FP16
-baseline (463–466 W) despite two resident models, consistent with fewer full
-8B-parameter forward passes required per unit of output as accepted draft batches grow.
+![Speed and energy per token, each method at its best configuration](assets/likeforlike_speed_energy.png)
 
-### Why these prompts
+EAGLE-3's lead is smallest on math, coding and roleplay prompts, and largest on humanities
+prompts and the three reference prompts. In vLLM, K5 is ahead on the math category.
 
-The three prompts span a range of *token-level predictability* for the model, not
-difficulty for a person — and that distinction matters, because the results above can
-look backwards at first glance. Code is often considered a more cognitively demanding
-task than free-form poetry, yet it gets the largest speedup (85.4% accept rate) while
-poetry gets the smallest (42.5%).
+![Speedup by prompt category, K5 vs. best EAGLE-3](assets/likeforlike_by_category.png)
 
-The resolution: speculative decoding's accept rate depends on how sharply peaked the
-model's next-token probability distribution is, which is a different axis from how hard
-a task is for a person. Code has strict, learned syntactic structure — matching
-brackets, indentation rules, a constrained vocabulary of keywords and common idioms — so
-at most token positions there is essentially one syntactically valid continuation, or a
-very small set of them. The scout's greedy guess is usually right, and draft windows
-survive largely intact regardless of how logically demanding the underlying code is to
-write. Open-ended creative writing has close to the opposite property at the token
-level: at nearly every position there are many equally plausible word choices (synonyms,
-alternate phrasings, meter- and rhyme-driven word selection for the Chant Royal form
-used here), so the model's distribution is flatter and the scout is wrong more often —
-again, independent of how hard the poem actually is to compose. Physics explanation
-falls in between: more lexical variety than code, but far less than open verse, and its
-51.7% accept rate lands squarely between the other two.
+## Full results
 
-This is precisely the axis speculative decoding's speedup is sensitive to (see the
-accept-rate figure above), which is why the prompts were chosen to span it deliberately
-— not to span perceived task difficulty.
+All numbers below are from `telemetry/likeforlike/20260925_035521_full/report.md`.
+Speed and energy are relative to no speculation in the same engine; all 27 prompts.
+Accept length = tokens produced per target verification step.
 
-## Comparison to vLLM's own built-in speculative decoding
+**SGLang 0.5.20** (baseline drift within a block: 1.5%)
 
-*Added 2026-09-18. A separate, additional benchmark, not part of the main table above —
-see the caveats immediately below before citing this anywhere.*
-
-vLLM ships its own native speculative decoding, including a `draft_model` method with a
-fixed `num_speculative_tokens` setting — mechanistically the same approach as this repo
-(small draft model, fixed draft window, target model verifies). Until now this repo had
-never actually been benchmarked against it. `benchmarks/benchmark_vllm_comparison.py`
-does that directly: same scout (`Llama-3.2-1B-Instruct`) and target
-(`Llama-3.1-8B-Instruct`) models, same three reference prompts, vLLM's own engine and
-KV-cache for both arms, `N=10` trials/prompt, greedy decoding.
-
-| Prompt | vLLM baseline (tok/s) | vLLM + K5 mechanism (tok/s) | Speedup |
+| Config | Speed [95%] | Energy/token | Accept len |
 |---|---|---|---|
-| Poem | 100.6 | 123.1 | +22.4% |
-| Physics | 100.8 | 151.8 | +50.6% |
-| Code | 100.8 | 201.4 | **+99.9%** |
+| EAGLE-3, tree (5 steps, top-k 8, 32 tokens) | +106.8% [+94.7, +119.7] | −59.2% | 3.53 |
+| **K5 (draft, K=5)** | **+76.7% [+66.1, +88.3]** | −54.3% | 4.28 |
+| Draft, K=7 | +74.0% [+60.4, +89.7] | −52.9% | 5.07 |
+| Draft, K=3 | +65.8% [+58.6, +73.2] | −51.5% | 3.20 |
+| EAGLE-3, K=5 (chain) | +55.2% [+45.1, +66.4] | −47.7% | 2.46 |
+| EAGLE-3, K=3 (chain) | +53.8% [+46.5, +62.5] | −48.8% | 2.20 |
+| N-gram (16 draft tokens) | +8.0% [+2.7, +13.8] | −23.2% | 1.41 |
+| EAGLE-1, K=5 — *excluded, not speculating* | −44.1% | +49.2% | 1.01 |
 
-The K5 mechanism (fixed-K=5, scout→target draft-and-verify) measurably outperforms
-vLLM's own FP16 baseline when run natively inside vLLM's serving engine, across all
-three reference prompts.
+**vLLM 0.27.1** (baseline drift within a block: 4.1% — above the 3% warning threshold,
+so treat small differences with caution)
 
-**Important caveats:**
-- **Not directly comparable to the main results table above.** vLLM uses PagedAttention
-  (KV-caching) for both arms here; the main table deliberately uses no KV-cache on
-  either arm, for a different reason (isolating the speculative mechanism itself from
-  caching effects). These are two different, both-valid comparisons answering different
-  questions — don't put both tables' baseline numbers side by side as if they were one
-  data set.
-- **vLLM only, not SGLang.** SGLang's own built-in speculative decoding is adaptive
-  (EAGLE-based, tiered draft length) — a different mechanism, closer in spirit to
-  SDSIE's still-unvalidated entropy-gated approach than to fixed-K5. It has not been
-  benchmarked here.
-- **Single full run, not yet independently cross-validated by a second script**, unlike
-  the main results above (which are corroborated by `speculative_scout.py`
-  independently). Measurement methodology (closed-loop per-prompt warmup via
-  `bench_common.warm_to_steady_state`, plus a short per-trial warmup) mirrors the rest
-  of this repo, and a first-round rotation-order artifact (whichever prompt ran first in
-  a round measured slower, regardless of which prompt it was) was found and fixed during
-  development — see the script's own docstring and commit history for the full
-  diagnostic trail.
+| Config | Speed [95%] | Energy/token | Accept len |
+|---|---|---|---|
+| EAGLE-3, K=3, async scheduling off | +79.6% [+70.4, +90.2] | −50.1% | 2.21 |
+| EAGLE-3, K=5, async scheduling off | +76.1% [+64.0, +89.1] | −50.0% | 2.47 |
+| EAGLE-3, K=3 | +74.0% [+64.9, +84.2] | −49.4% | 2.21 |
+| EAGLE-3, K=5 | +73.8% [+62.2, +86.1] | −48.9% | 2.47 |
+| EAGLE-3, K=2 | +65.8% [+59.4, +72.5] | −47.3% | 1.99 |
+| EAGLE-1, K=3 | +59.7% [+51.4, +68.9] | −42.2% | 2.27 |
+| Draft, K=3 | +56.6% [+50.6, +63.2] | −51.3% | 3.18 |
+| **K5 (draft, K=5)** | **+54.6% [+45.3, +64.7]** | −51.7% | 4.19 |
+| Draft, K=7 | +48.7% [+37.1, +61.7] | −49.3% | 4.93 |
+| EAGLE-1, K=5 | +45.3% [+35.8, +56.3] | −36.4% | 2.43 |
+| N-gram, K=5 | −7.6% [−10.9, −4.1] | −14.1% | 1.93 |
+
+In SGLang, EAGLE-3 in chain mode is *slower* than K5. Only its tree configuration
+overtakes K5. Turning off vLLM's async scheduling made EAGLE-3 *faster* (see below).
+
+## How the comparison is kept fair
+
+The benchmark is `benchmarks/likeforlike_suite.py` (details in the docstring of
+`likeforlike_worker.py`). The rules, and why each exists:
+
+- **Same engine only.** vLLM is compared with vLLM, SGLang with SGLang. Numbers from
+  different engines are never set against each other, since they differ by engineering,
+  not algorithm.
+- **Every method gets several configurations**, not one fixed K. The best configuration
+  of each method is chosen on 14 prompts and reported on the other 13, so no method is
+  graded on the data it was tuned on.
+- **Each timed prompt is generated once per engine process.** Repetitions happen in
+  fresh processes. This stops methods with cross-request memory from "drafting" their
+  own previous answer to an identical prompt. This is the likely cause of an earlier
+  implausible SGLang n-gram result (>900 tok/s), which dropped to +8% under this rule.
+- **Warmup uses separate, never-timed prompts.** Prefix caching is off in both engines.
+- **Every block of runs starts and ends with a baseline run.** Configuration order is
+  randomized (seed recorded), and speedups are computed per prompt against the same
+  block's baselines.
+- **Automatic sanity checks.** A configuration is excluded from "best" if its accept
+  length is ~1 (not really speculating), or if its speedup exceeds its accept length
+  (physically impossible). SGLang's EAGLE-1 was excluded this way.
+- **Prompts:** the three reference prompts below, plus 24 original prompts in the eight
+  categories used by MT-Bench (not the MT-Bench questions themselves).
+
+**Remaining asymmetries, stated plainly:**
+
+- In SGLang, tree drafting was tested for EAGLE-3 but not for the draft model.
+- vLLM runs `draft_model` on its older V1 model runner with async scheduling off, and
+  runs EAGLE-3 on the newer V2 runner (both confirmed in vLLM's own logs). The "async
+  scheduling off" EAGLE-3 rows match one of these two differences. Disabling async
+  scheduling made EAGLE-3 faster, not slower, so it is not a handicap to K5. The
+  model-runner difference is not matched.
+- vLLM's EAGLE-3 was tested in chain mode only.
+
+Any of these could shift the margins. We don't expect them to reverse the speed ordering,
+but that hasn't been tested.
+
+## Output fidelity: what "lossless" does and doesn't mean
+
+With greedy decoding, speculative decoding is lossless **in exact arithmetic**: every
+accepted token is the target model's own choice. In practice, inside these engines in
+bfloat16, the output of **every speculative method tested** (EAGLE-3 included) differs
+from the same engine's non-speculative output at some point in most responses. On
+average, 52–72% of each response matches before the first differing token, and 30–48%
+of responses are fully identical. By contrast, two non-speculative runs of the same
+engine matched each other 100%.
+
+Verification processes several tokens per forward pass, and the resulting rounding
+differences can flip near-tied choices. This affects all methods alike, including
+SGLang's EAGLE-1 run, which accepted almost no drafts. It is not specific to K5.
+
+## Controlled mechanism isolation (cache-free harness)
+
+Separately, `benchmarks/benchmark_ablation.py` reimplements the draft-verify loop in
+plain PyTorch/Transformers with **no KV-cache in either arm**, so both arms do identical
+full recomputation and only the mechanism differs. Absolute throughput is therefore far
+below a real server. The *relative* comparison is the result. Measured 2026-09-05:
+N=10 trials per prompt, closed-loop warmup converged, residual drift R² ≤ 0.037, and
+**100% token-for-token fidelity** on every prompt.
+
+| Prompt | Baseline tok/s | Speculative tok/s | Speedup | Energy/token Δ | Accept % |
+|---|---|---|---|---|---|
+| Poem | 40.16 ± 0.28 | 43.55 ± 0.31 | +8.4% | −32.7% | 42.5% |
+| Physics | 40.05 ± 0.18 | 49.64 ± 0.43 | +24.0% | −39.2% | 51.7% |
+| Code | 40.04 ± 0.23 | 73.46 ± 0.74 | +83.5% | −60.8% | 85.4% |
+
+![Throughput: baseline vs. speculative (cache-free harness)](assets/throughput_baseline_vs_speculative.png)
+![Energy per token: baseline vs. speculative (cache-free harness)](assets/energy_per_token_baseline_vs_speculative.png)
+
+Gains grow with the draft accept rate, as the mechanism predicts. That rate depends on
+how *predictable the next token* is, not on how hard the task is for a person. Code has
+rigid syntax, so the draft model's guesses are usually right (85% accepted). Open verse
+has many equally good word choices at almost every position (43%).
+
+![Speedup vs. draft accept rate (cache-free harness)](assets/speedup_vs_accept_rate.png)
+
+These accept rates agree closely with those from vLLM's own, independent draft-model
+implementation on the same three prompts (43.3 / 57.8 / 85.0%).
+
+**A KV-cached version of this plain Python harness does not reproduce a speedup**
+(`benchmark_cached_ablation.py`). In eager Python, the per-call overhead makes one call
+of the 1B draft model cost a large fraction of one call of the 8B target, which removes
+the draft model's advantage. That explanation comes from a cost model whose predictions
+match the measurements; per-call times were inferred, not measured directly. The
+practical point: with caching on, the mechanism needs an optimized engine to pay off,
+which is exactly what the engine comparison above measures.
 
 ## What this does NOT claim
 
-- No quantization/kernel work is included here (see the SDSIE research repo for that,
-  including a report of where it currently helps and where it doesn't).
-- No dynamic/entropy-gated draft-length adjustment — K is fixed at 5. An entropy-gated
-  version was tested and, as of the latest findings from that research repo, does not yet
-  outperform this fixed-K approach in single-request testing (nor does a related
-  entropy-gated *precision*-switching mechanism, tested separately). This repo
-  intentionally ships the simpler, proven approach rather than either more ambitious,
-  not-yet-validated alternative.
-- No KV-cache in the main results table above (deliberate, for a fair baseline-vs-speculative
-  comparison — see "Methodology" below). Absolute throughput numbers there are not
-  production-representative; the relative comparison (baseline vs. speculative under
-  identical conditions) is what's been validated. The separate vLLM comparison above
-  does use KV-caching (vLLM's own default) and is reported separately for that reason.
-- No SGLang comparison yet (see above).
+- **Not faster than EAGLE-3.** A properly configured EAGLE-3 is faster in both engines.
+- **Not a new algorithm.** It is the standard draft-model method, measured carefully.
+- **Only batch size 1.** Datacenter serving usually batches many requests, and the
+  benefit of speculative decoding is known to depend on batch size. These energy results
+  should not be extrapolated to batched serving without measuring it.
+- **One model pair, one GPU** (RTX 5090 under WSL2, no clock locking), 250-token
+  responses, two repetitions per configuration.
+- **No dynamic/entropy-gated draft length.** An entropy-gated variant was tested in the
+  parent SDSIE project and has not, so far, beaten the fixed window in single-request
+  testing.
 
-## Methodology
+## Earlier engine comparisons (superseded)
 
-Both baseline and speculative paths run with **no KV-cache** (full recompute each step).
-This was a deliberate choice to keep the comparison fair — an earlier version of this
-work applied caching unevenly, which structurally penalized the speculative path on any
-fallback step. Recomputing from scratch for both arms removes that confound, at the cost
-of both being slower in absolute terms than a production server with caching would be.
+`benchmark_vllm_comparison.py`, `benchmark_vllm_spec_methods.py` and
+`benchmark_sglang_spec_methods.py` (September 18–21) were first attempts at this
+comparison. They held every method at K=5 and used only three prompts, which favoured
+K5: EAGLE-3 was never tried at its best settings. Their telemetry stays in `telemetry/`
+for the record, but their numbers are superseded by the like-for-like results above
+and shouldn't be cited.
 
-Warmup happens in two layers. Before any timed trial, a **closed-loop thermal warmup**
-runs real (discarded) baseline and speculative decoding cycles, alternating across all
-three prompts and both conditions, until *each* prompt/condition combination's own power
-AND temperature readings individually stop drifting — not until consecutive readings
-across different combinations happen to agree with each other, since baseline and
-speculative draw genuinely different power (and settle at different temperatures) by
-design. This is now a two-stage fix on top of the original design (see
-`bench_common.py`'s `warm_to_steady_state` docstring for the full history): first, a
-warmup burst shorter than the real trial length was found to converge at a lower
-power/temp level than the real, longer trial then reached, so burst length was matched to
-trial length; second, and found later, a fixed absolute power tolerance (1.5 W) turned
-out to be tighter than the hardware's own sample-to-sample noise floor on this machine
-(measured sd: 2.9 W baseline, 6.8 W speculative), so it could never be satisfied
-regardless of run length, and temperature was pooled across labels on the assumption that
-die temperature is workload-independent — true only when the workload is homogeneous,
-false here, since baseline and speculative settle roughly 3-4°C apart. Both fixed: power
-tolerance is now relative to each label's own mean draw (1.5%), temperature is tracked
-per label like power, and both use a half-split drift statistic (newer-half mean vs.
-older-half mean of a rolling window) rather than raw min-max spread, which does not grow
-spuriously with window length under pure noise the way spread does. On top of the
-closed-loop warmup, each individual timed trial is still preceded by 5 short untimed
-warmup forward passes immediately before measurement starts, avoiding cold-SM effects at
-the start of each specific trial. This two-layer warmup procedure is shared between
-`benchmark_ablation.py` and `speculative_scout.py` via `bench_common.py`, and reused (via
-the same `warm_to_steady_state` function) by `benchmark_vllm_comparison.py` above.
+## Methodology notes
 
-Energy per token is read from the GPU's onboard hardware energy counter
-(`nvmlDeviceGetTotalEnergyConsumption`) when available — as it was for every trial in
-the results above — rather than integrated from sampled power readings, which is a more
-direct and less bias-prone measurement; sampled trapezoidal integration is retained as a
-fallback and cross-check when the counter isn't supported. Power itself is still sampled
-via 100 Hz NVML polling. Fidelity is measured as exact greedy-decoding token match
-between baseline and speculative output.
-
-### Measurement validity (drift check)
-
-Each reported run's per-trial telemetry is checked for residual warmup drift: a
-least-squares fit of power, energy/token, and throughput against chronological trial
-index. The run behind the table above is the first on this project to have both a fully
-**converged** closed-loop warmup (241.3 s, well under the 420 s cap — every prior run
-hit the cap without converging) and the cleanest drift diagnostics to date: R² for every
-metric, pooled and per-condition, is effectively zero (0.00004 to 0.037), and the
-script's own pass/fail threshold (±0.5% of mean power) passed cleanly this time (pooled
-0.30%, baseline-only 0.38%, speculative-only 0.19%) — not just "passed despite the flag
-firing," as in earlier runs, but genuinely within tolerance on every check. This is the
-strongest evidence yet that the reported means reflect real steady-state behavior rather
-than a residual thermal trend.
+- **Energy** is read from the GPU's hardware energy counter
+  (`nvmlDeviceGetTotalEnergyConsumption`) at the start and end of each timed request.
+  Power and temperature are sampled at 100 Hz for warmup and drift checks.
+- **Warmup** is closed-loop: it runs real generations until each prompt's own power and
+  temperature readings stop drifting (a half-split drift test with tolerances relative to
+  each prompt's own mean), and never less than 150 s in the engine comparison. The full
+  history of how this procedure was developed and debugged is in the
+  `warm_to_steady_state` docstring in `bench_common.py`.
+- **Statistics:** per-prompt speedups are combined with a geometric mean. The 95% ranges
+  are bootstrap intervals over prompts (2000 resamples).
 
 ## Repository structure
 
 ```
 benchmarks/
-  speculative_scout.py         - Standalone reference implementation, single-run
-  benchmark_ablation.py        - N=10 trial ablation across 3 prompts (source of main table)
-  benchmark_vllm_comparison.py - K5 mechanism vs. vLLM's own built-in speculative decoding
-                                  (source of the vLLM comparison table above)
-  bench_common.py              - Shared NVML monitor, closed-loop warmup, accept/reject
-                                  decode loop, and drift diagnostics used by all three
-                                  benchmark scripts above
-  plot_ablation_results.py, rebuild_summary.py
+  likeforlike_suite.py      - Runs the like-for-like comparison (source of the main results)
+  likeforlike_worker.py     - One engine + one configuration per process
+  likeforlike_analyze.py    - Statistics, sanity checks, report.md / summary.json
+  plot_likeforlike.py       - Figures for the like-for-like results
+  benchmark_ablation.py     - Cache-free mechanism isolation (N=10 trials, 3 prompts)
+  speculative_scout.py      - Single-run version of the same cache-free loop
+  bench_common.py           - Shared NVML monitor, closed-loop warmup, decode loop, drift checks
+  benchmark_cached_ablation.py - KV-cached plain-Python harness (does not reproduce a speedup; see above)
+  benchmark_vllm_comparison.py, benchmark_vllm_spec_methods.py,
+  benchmark_sglang_spec_methods.py - Earlier engine comparisons (superseded)
+  plot_ablation_results.py  - Figures for the cache-free harness
 docs/
-  fixed_k5_paper.tex / .pdf  - The paper (see below), figures pulled from assets/
-telemetry/                 - Raw JSON/CSV output from the runs behind the tables above
-assets/                     - Plots generated from telemetry (see plot_*.py scripts)
+  fixed_k5_paper.tex / .pdf - The paper (figures drawn in LaTeX; compiles on its own)
+telemetry/
+  likeforlike/<run>/        - Report, summary, per-run JSON and logs for each suite run
+  ablation_results.json     - Cache-free harness results
+  (other files)             - Earlier runs, kept for the record
+assets/                     - Figures used in this README
+requirements-vllm.txt       - vLLM environment (pinned)
+requirements-sglang.txt     - SGLang environment (pinned)
+requirements.txt            - Cache-free harness environment (minimum versions)
 ```
 
 ## Running it
 
+The engine comparison needs **two separate environments**: vLLM and SGLang require
+different versions of shared packages and can't be installed together. The cache-free
+harness runs in a third, plain PyTorch environment.
+
+| File | Environment for | Versions |
+|---|---|---|
+| `requirements-vllm.txt` | vLLM runs of the like-for-like suite, plot scripts | pinned to what the published results used |
+| `requirements-sglang.txt` | SGLang runs of the like-for-like suite | pinned to what the published results used |
+| `requirements.txt` | cache-free harness (`benchmark_ablation.py` etc.) | minimums only (see the note in the file) |
+
 ```bash
-pip install -r requirements.txt
-cd benchmarks
-
-# Single run against one prompt
-python3 speculative_scout.py
-
-# Full N=10 ablation (takes several minutes, loads two models)
-python3 benchmark_ablation.py
-
-# K5 mechanism vs. vLLM's own speculative decoding (requires vllm; see script docstring)
-python3 benchmark_vllm_comparison.py --mode baseline
-python3 benchmark_vllm_comparison.py --mode speculative
-
-# Regenerate plots from the latest telemetry
-python3 plot_ablation_results.py
+python -m venv .vllmvenv && .vllmvenv/bin/pip install -r requirements-vllm.txt
+python -m venv .sglangvenv && .sglangvenv/bin/pip install -r requirements-sglang.txt
 ```
 
-Requires an NVIDIA GPU with enough VRAM for both a ~1B and ~8B parameter model in
-bfloat16 (roughly 18-20 GB total), and access to the `meta-llama/Llama-3.2-1B-Instruct`
-and `meta-llama/Llama-3.1-8B-Instruct` checkpoints (gated on Hugging Face — request
-access first if you haven't already).
+```bash
+cd benchmarks
+
+# Like-for-like engine comparison. vLLM and SGLang usually live in separate
+# environments: pass each one's python. Plumbing test without a GPU first:
+python likeforlike_suite.py --engines mock --preset quick
+
+# Short real test (3 prompts, a few configurations, ~1 hour):
+python likeforlike_suite.py --engines vllm,sglang --preset quick \
+    --vllm-python /path/to/vllm-env/bin/python \
+    --sglang-python /path/to/sglang-env/bin/python
+
+# Full comparison (27 prompts, all configurations, 2 repetitions; several hours):
+python likeforlike_suite.py --engines vllm,sglang --preset full --reps 2 \
+    --vllm-python /path/to/vllm-env/bin/python \
+    --sglang-python /path/to/sglang-env/bin/python
+
+# Figures from a finished run:
+python plot_likeforlike.py ../telemetry/likeforlike/<run>/summary.json
+
+# Cache-free mechanism isolation (loads both models with Transformers):
+python benchmark_ablation.py
+```
+
+Needs an NVIDIA GPU with room for a ~1B and a ~8B model in bfloat16 (about 18–20 GB),
+and access to the gated `meta-llama/Llama-3.2-1B-Instruct` and
+`meta-llama/Llama-3.1-8B-Instruct` checkpoints on Hugging Face. Each results file
+records the exact library versions it was produced with. The package versions behind
+the cache-free table (2026-09-05) were not recorded, so `requirements.txt` gives
+minimum versions only.
 
 ## Relationship to SDSIE
 
-This repo originated as an extraction from the broader
+This repo began as an extraction from the broader
 [SDSIE](https://github.com/Creepybits/software-defined-stochastic-inference-engine)
-research project: an early correction process there (see its README) found that a
-claimed unified system (quantization + entropy-gated speculation) wasn't actually wired
-together end-to-end, while this specific fixed-K speculative decoding piece was real and
-independently reproducible. Since then, SDSIE has gone on to test both of its more
-ambitious entropy-gated mechanisms for real — adaptive speculative draft length, and
-adaptive INT4/FP16 precision switching — and found neither yet improves on this
-simpler, fixed approach. This repo remains the validated, production-ready result from
-that research line; SDSIE remains the broader research project, reporting its ongoing
-work (including negative results) with the same evidentiary standard.
+research project, where this fixed-window piece was the part found to be real and
+reproducible. SDSIE's more ambitious mechanisms (entropy-gated draft length, entropy-gated
+precision switching) have been tested and so far have not beaten this simpler approach.
+The two codebases have since diverged. Results in one do not carry over to the other.
 
 ## License
 

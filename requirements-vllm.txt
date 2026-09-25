@@ -1,0 +1,22 @@
+# vLLM environment -- for the like-for-like suite's vLLM runs
+# (benchmarks/likeforlike_suite.py / likeforlike_worker.py) and the plot scripts.
+#
+# These are the versions the published like-for-like results were measured with
+# (telemetry/likeforlike/20260925_035521_full/), taken from the environment's own
+# `pip list` on 2026-09-24. Each run's JSON also records the versions it used.
+#
+# Install into its OWN virtual environment -- vLLM and SGLang require different
+# versions of shared packages and cannot share one environment.
+#
+#   python -m venv .vllmvenv && source .vllmvenv/bin/activate
+#   pip install -r requirements-vllm.txt
+#
+# torch is installed automatically by vLLM. The results used torch 2.13.0+cu132
+# (a CUDA 13.2 build). If pip picks a different CUDA build for your system, see
+# vLLM's own installation instructions for selecting one.
+
+vllm==0.27.1
+transformers==5.15.1
+numpy==2.3.5
+nvidia-ml-py==13.610.43   # provides the `pynvml` module used for power/energy readings
+matplotlib==3.11.1        # only needed for the plot_*.py scripts

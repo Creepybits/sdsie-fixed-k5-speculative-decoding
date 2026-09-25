@@ -1,0 +1,23 @@
+# SGLang environment -- for the like-for-like suite's SGLang runs
+# (benchmarks/likeforlike_suite.py / likeforlike_worker.py).
+#
+# These are the versions the published like-for-like results were measured with
+# (telemetry/likeforlike/20260925_035521_full/), taken from the environment's own
+# `pip list` on 2026-09-24. Each run's JSON also records the versions it used.
+#
+# Install into its OWN virtual environment -- vLLM and SGLang require different
+# versions of shared packages and cannot share one environment.
+#
+#   python -m venv .sglangvenv && source .sglangvenv/bin/activate
+#   pip install -r requirements-sglang.txt
+#
+# torch is installed automatically by SGLang (the results used torch 2.13.0).
+# Note: the environment the results came from also contained several pre-release
+# packages pulled in as dependencies (e.g. pydantic 2.14.0b2, safetensors 0.9.0rc0).
+# They are deliberately not pinned here; if a clean install behaves differently,
+# that is the first thing to compare.
+
+sglang==0.5.20
+transformers==5.12.1
+numpy==2.3.5
+nvidia-ml-py==13.610.43   # provides the `pynvml` module used for power/energy readings
