@@ -6,6 +6,7 @@
 \usepgfplotslibrary{groupplots}
 \pgfplotsset{compat=1.18}
 \usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue}
 
 % All figures are drawn with pgfplots from numbers in this file, so the paper
 % compiles on its own with no external image files. Every number is traceable
@@ -29,7 +30,10 @@ A Like-for-Like, Energy-Measured Comparison \\ in vLLM and SGLang}
 
 \author{
 \IEEEauthorblockN{Zanno Jacklin}
-\IEEEauthorblockA{Independent Researcher, Creepybits}
+\IEEEauthorblockA{Independent Researcher, Creepybits\\
+business@zanno.se\\
+Preprint, October 2026 \textbullet{} DOI:
+\href{https://doi.org/10.5281/zenodo.22210487}{10.5281/zenodo.22210487}}
 }
 
 \maketitle
@@ -371,8 +375,8 @@ from memory of its own earlier answers to repeated identical prompts.
 
 \textbf{Asynchronous scheduling.} Disabling vLLM's asynchronous scheduling
 made EAGLE-3 faster, not slower (+79.6\% versus +74.0\% at $K{=}3$, all
-prompts). vLLM disabling it for the draft model is therefore not a
-handicap to K5 at batch size~1. We do not have an explanation for this.
+prompts). Disabling it, as vLLM does for the draft model, is therefore not
+a handicap to K5 at batch size~1. We do not have an explanation for this.
 
 \textbf{Fidelity in serving engines.} In both engines two non-speculative
 baseline runs produce identical output (100\%). Every speculative method,
@@ -380,7 +384,7 @@ however, diverges from its engine's baseline at some point in most
 responses: on average 52--72\% of each output matches before the first
 differing token, and 30--48\% of outputs are fully identical
 (Table~\ref{tab:all}). This holds for EAGLE-3 as much as for K5, and even
-for SGLang's EAGLE-1, which accepted almost no drafts (54\%). We interpret
+for SGLang's EAGLE-1, which accepted almost no drafts (54\% mean match). We interpret
 this as a numerical effect of running the engines in speculative mode in
 bfloat16: verification processes several tokens per forward pass, and the
 resulting rounding differences can flip near-tied greedy choices, after
